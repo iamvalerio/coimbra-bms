@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="pt" class="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Coimbra Editora BMS</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script>tailwind.config={darkMode:'class',theme:{extend:{colors:{surface:'#1e293b',background:'#0f172a'}}}}</script>
+<style>
+body{background:#0f172a;color:#f1f5f9;font-family:'Segoe UI',system-ui,sans-serif;}
+.sidebar{width:260px;min-width:260px;}
+@media(max-width:768px){.sidebar{position:fixed;z-index:50;transform:translateX(-100%);transition:.3s;}.sidebar.open{transform:translateX(0);}}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:8px;cursor:pointer;transition:.15s;font-size:14px;color:#94a3b8;}
+.nav-item:hover{background:#1e293b;color:#f1f5f9;}
+.nav-item.active{background:#1d4ed8;color:#fff;font-weight:600;}
+.nav-section{font-size:10px;font-weight:700;letter-spacing:.1em;color:#475569;padding:16px 14px 4px;}
+.card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155;}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+.slider{-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:#334155;outline:none;}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#3b82f6;cursor:pointer;}
+.toggle{position:relative;width:44px;height:24px;background:#334155;border-radius:12px;cursor:pointer;transition:.2s;}
+.toggle.on{background:#3b82f6;}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s;}
+.toggle.on::after{left:23px;}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:#0f172a;}
+::-webkit-scrollbar-thumb{background:#334155;border-radius:3px;}
+.page{display:none;}
+.page.active{display:block;}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;}
+.modal.open{display:flex;}
+input,select,textarea{background:#0f172a;border:1px solid #334155;color:#f1f5f9;border-radius:8px;padding:8px 12px;width:100%;outline:none;font-size:14px;}
+input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
+.btn{padding:8px 18px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;border:none;}
+.btn-primary{background:#2563eb;color:#fff;}
+.btn-primary:hover{background:#1d4ed8;}
+.btn-ghost{background:transparent;color:#94a3b8;border:1px solid #334155;}
+.btn-ghost:hover{background:#1e293b;color:#f1f5f9;}
+.btn-danger{background:#dc2626;color:#fff;}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.animate-in{animation:slideIn .25s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.login-page{display:none;}
+.login-page.active{display:flex;}
+.app-shell{display:none;}
+.app-shell.active{display:flex;}
+
+/* Voice Assistant */
+.voice-btn{position:fixed;bottom:28px;right:28px;z-index:200;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(37,99,235,.5);transition:.2s;}
+.voice-btn:hover{transform:scale(1.08);}
+.voice-btn.listening{animation:voicePulse 1.2s ease-in-out infinite;background:linear-gradient(135deg,#dc2626,#ea580c);}
+@keyframes voicePulse{0%,100%{box-shadow:0 4px 24px rgba(220,38,38,.5),0 0 0 0 rgba(220,38,38,.4)}50%{box-shadow:0 4px 24px rgba(220,38,38,.5),0 0 0 18px rgba(220,38,38,0)}}
+.voice-panel{position:fixed;bottom:100px;right:28px;z-index:199;width:340px;background:#1e293b;border:1px solid #334155;border-radius:16px;overflow:hidden;transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s;box-shadow:0 8px 40px rgba(0,0,0,.5);}
+.voice-panel.open{transform:translateY(0);opacity:1;pointer-events:all;}
+.voice-wave{display:flex;align-items:center;justify-content:center;gap:3px;height:32px;}
+.voice-bar{width:3px;border-radius:2px;background:#3b82f6;transition:.1s;}
+.voice-bar.active{animation:waveAnim .6s ease-in-out infinite;}
+.voice-bar:nth-child(1){animation-delay:0s;}
+.voice-bar:nth-child(2){animation-delay:.1s;}
+.voice-bar:nth-child(3){animation-delay:.2s;}
+.voice-bar:nth-child(4){animation-delay:.1s;}
+.voice-bar:nth-child(5){animation-delay:0s;}
+@keyframes waveAnim{0%,100%{height:6px}50%{height:24px}}
+.voice-log{max-height:200px;overflow-y:auto;}
+.voice-log::-webkit-scrollbar{width:4px;}
+.voice-log::-webkit-scrollbar-thumb{background:#334155;}
+.voice-transcript{padding:6px 10px;border-radius:8px;font-size:13px;margin-bottom:6px;}
+.voice-user{background:#1d4ed833;color:#93c5fd;align-self:flex-end;}
+.voice-bms{background:#05471433;color:#86efac;}
+
+/* Scenario Builder */
+.condition-row,.action-row{display:flex;gap:8px;align-items:center;padding:10px;background:#0f172a;border-radius:8px;border:1px solid #334155;margin-bottom:8px;}
+.scenario-card{background:#1e293b;border:1px solid #334155;border-radius:12px;overflow:hidden;transition:.2s;}
+.scenario-card:hover{border-color:#3b82f6;}
+.scenario-card.active-scenario{border-color:#2563eb;box-shadow:0 0 0 1px #2563eb33;}
+.trigger-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.step-circle{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage" class="login-page min-h-screen items-center justify-center" style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%)">
+  <div class="flex w-full max-w-4xl shadow-2xl rounded-2xl overflow-hidden" style="min-height:520px">
+    <div class="flex-1 flex flex-col justify-between p-12" style="background:linear-gradient(135deg,#1d4ed8,#0f172a)">
+      <div>
+        <div class="flex items-center gap-3 mb-8">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="rgba(255,255,255,0.15)"/><path d="M8 32V16l12-8 12 8v16H24v-8h-8v8H8z" fill="white"/></svg>
+          <span class="text-xl font-bold text-white">Coimbra BMS</span>
+        </div>
+        <h1 class="text-3xl font-bold text-white mb-3">Building Management System</h1>
+        <p class="text-blue-200 text-sm">Gestão inteligente do Edifício Coimbra Editora</p>
+      </div>
+      <div class="space-y-3">
+        <div class="flex items-center gap-3 text-blue-200 text-sm"><span>💡</span> Iluminação, AVAC, Fotovoltaico</div>
+        <div class="flex items-center gap-3 text-blue-200 text-sm"><span>🔐</span> Segurança e Controlo de Acessos</div>
+        <div class="flex items-center gap-3 text-blue-200 text-sm"><span>🎤</span> Controlo por voz em português</div>
+        <div class="flex items-center gap-3 text-blue-200 text-sm"><span>⚡</span> Cenários de automação avançados</div>
+      </div>
+    </div>
+    <div class="flex-1 flex flex-col justify-center p-12" style="background:#1e293b">
+      <h2 class="text-2xl font-bold text-white mb-2">Bem-vindo</h2>
+      <p class="text-slate-400 text-sm mb-8">Insira as suas credenciais para aceder</p>
+      <div id="loginError" class="hidden mb-4 p-3 rounded-lg text-sm" style="background:#450a0a;color:#fca5a5;border:1px solid #7f1d1d"></div>
+      <div class="space-y-4">
+        <div><label class="text-xs font-semibold text-slate-400 mb-1 block">EMAIL</label><input id="loginEmail" type="email" placeholder="admin@coimbra-bms.pt" value="admin@coimbra-bms.pt"/></div>
+        <div><label class="text-xs font-semibold text-slate-400 mb-1 block">PASSWORD</label><input id="loginPass" type="password" placeholder="••••••••" value="Password123!"/></div>
+        <button onclick="doLogin()" class="btn btn-primary w-full mt-2" style="padding:12px">Entrar</button>
+      </div>
+      <div class="mt-6 p-3 rounded-lg text-xs text-slate-400" style="background:#0f172a">
+        <div class="font-semibold mb-1 text-slate-300">Demo:</div>
+        <div>admin@coimbra-bms.pt · Password123!</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="appShell" class="app-shell h-screen overflow-hidden">
+  <!-- SIDEBAR -->
+  <div id="sidebar" class="sidebar h-full flex flex-col" style="background:#0d1b2e;border-right:1px solid #1e293b">
+    <div class="p-4 flex items-center gap-3" style="border-bottom:1px solid #1e293b">
+      <svg width="32" height="32" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="8" fill="#2563eb"/><path d="M8 32V16l12-8 12 8v16H24v-8h-8v8H8z" fill="white"/></svg>
+      <div><div class="font-bold text-white text-sm">Coimbra BMS</div><div class="text-xs text-slate-500">v1.0.0</div></div>
+    </div>
+    <div class="flex-1 overflow-y-auto p-2">
+      <div class="nav-section">GERAL</div>
+      <div class="nav-item active" onclick="showPage('dashboard',this)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> Dashboard
+      </div>
+      <div class="nav-item" onclick="showPage('voice',this)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        Assistente de Voz <span class="ml-auto text-xs px-1.5 py-0.5 rounded" style="background:#7c3aed22;color:#a78bfa">NOVO</span>
+      </div>
+      <div class="nav-section">SISTEMAS</div>
+      <div class="nav-item" onclick="showPage('lighting',this)">💡 Iluminação</div>
+      <div class="nav-item" onclick="showPage('hvac',this)">🌡️ AVAC</div>
+      <div class="nav-item" onclick="showPage('solar',this)">☀️ Fotovoltaico</div>
+      <div class="nav-item" onclick="showPage('elevator',this)">🛗 Elevadores</div>
+      <div class="nav-item" onclick="showPage('electrical',this)">⚡ Elétrico</div>
+      <div class="nav-item" onclick="showPage('fire',this)">🔥 SCI</div>
+      <div class="nav-item" onclick="showPage('water',this)">💧 Redes Hidráulicas</div>
+      <div class="nav-item" onclick="showPage('security',this)">🔐 Segurança</div>
+      <div class="nav-section">GESTÃO</div>
+      <div class="nav-item" onclick="showPage('scenarios',this)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Cenários
+      </div>
+      <div class="nav-item" onclick="showPage('alerts',this)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Alertas <span id="alertBadge" class="ml-auto badge" style="background:#7f1d1d;color:#fca5a5">3</span>
+      </div>
+      <div class="nav-item" onclick="showPage('reports',this)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Relatórios
+      </div>
+      <div class="nav-item" onclick="showPage('users',this)">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Utilizadores
+      </div>
+    </div>
+    <div class="p-3" style="border-top:1px solid #1e293b">
+      <div class="flex items-center gap-3 p-2 rounded-lg" style="background:#1e293b">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style="background:#2563eb">MV</div>
+        <div class="flex-1 min-w-0"><div class="text-sm font-semibold text-white truncate">Miguel Valerio</div><div class="text-xs text-slate-400">ADMIN</div></div>
+        <button onclick="doLogout()" class="text-slate-400 hover:text-white" title="Logout">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex items-center justify-between px-6 py-3" style="background:#0d1b2e;border-bottom:1px solid #1e293b">
+      <button class="md:hidden text-slate-400" onclick="document.getElementById('sidebar').classList.toggle('open')">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div><h1 id="pageTitle" class="font-bold text-white text-lg">Dashboard</h1><div class="text-xs text-slate-400">Edifício Coimbra Editora · Piso 1–5</div></div>
+      <div class="flex items-center gap-4">
+        <div id="clock" class="text-sm text-slate-400 hidden md:block"></div>
+        <button onclick="showPage('alerts',null)" class="relative p-2 rounded-lg text-slate-400 hover:text-white" style="background:#1e293b">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full text-xs flex items-center justify-center font-bold" style="background:#dc2626;color:white">3</span>
+        </button>
+        <!-- Voice quick button in topbar -->
+        <button onclick="toggleVoicePanel()" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold" style="background:linear-gradient(135deg,#2563eb22,#7c3aed22);border:1px solid #3b82f655;color:#93c5fd">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
+          Voz
+        </button>
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style="background:#2563eb">MV</div>
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-6">
+
+      <!-- ==================== DASHBOARD ==================== -->
+      <div id="page-dashboard" class="page active animate-in">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="card"><div class="flex items-start justify-between"><div><div class="text-xs text-slate-400 mb-1">DISPOSITIVOS ONLINE</div><div class="text-3xl font-bold text-white">27<span class="text-slate-500 text-lg">/30</span></div></div><div class="p-2 rounded-lg" style="background:#052e16"><span style="color:#4ade80">✓</span></div></div><div class="mt-2 text-xs" style="color:#4ade80">↑ Todos operacionais</div></div>
+          <div class="card"><div class="flex items-start justify-between"><div><div class="text-xs text-slate-400 mb-1">ALERTAS ATIVOS</div><div class="text-3xl font-bold text-white">3</div></div><div class="p-2 rounded-lg" style="background:#450a0a"><span style="color:#f87171">⚠</span></div></div><div class="mt-2 text-xs" style="color:#f87171">1 crítico · 2 aviso</div></div>
+          <div class="card"><div class="flex items-start justify-between"><div><div class="text-xs text-slate-400 mb-1">ENERGIA HOJE</div><div class="text-3xl font-bold text-white">284<span class="text-slate-500 text-lg"> kWh</span></div></div><div class="p-2 rounded-lg" style="background:#1c1917"><span style="color:#fbbf24">⚡</span></div></div><div class="mt-2 text-xs" style="color:#fbbf24">☀️ 68 kWh solar</div></div>
+          <div class="card"><div class="flex items-start justify-between"><div><div class="text-xs text-slate-400 mb-1">CENÁRIOS ATIVOS</div><div class="text-3xl font-bold text-white">2</div></div><div class="p-2 rounded-lg" style="background:#1e1b4b"><span style="color:#818cf8">⚡</span></div></div><div class="mt-2 text-xs" style="color:#818cf8">Escritório · Eco</div></div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          <div class="lg:col-span-2 card">
+            <div class="text-sm font-semibold text-white mb-4">Estado dos Sistemas</div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="systemsGrid"></div>
+          </div>
+          <div class="card"><div class="text-sm font-semibold text-white mb-4">Energia — últimas 24h</div><canvas id="energyChart" height="180"></canvas></div>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="card">
+            <div class="flex items-center justify-between mb-4"><div class="text-sm font-semibold text-white">Alertas Recentes</div><button onclick="showPage('alerts',null)" class="text-xs text-blue-400">Ver todos →</button></div>
+            <div id="alertsList" class="space-y-2"></div>
+          </div>
+          <div class="card"><div class="text-sm font-semibold text-white mb-4">Mapa do Edifício</div><div id="floorMap" class="space-y-2"></div></div>
+        </div>
+      </div>
+
+      <!-- ==================== VOICE PAGE ==================== -->
+      <div id="page-voice" class="page animate-in">
+        <div class="max-w-2xl mx-auto">
+          <!-- Hero -->
+          <div class="card mb-6 text-center" style="background:linear-gradient(135deg,#1e1b4b,#1e293b);border-color:#4c1d95">
+            <div class="mb-4">
+              <div id="voicePageIcon" class="inline-flex items-center justify-center w-20 h-20 rounded-full mx-auto mb-4" style="background:linear-gradient(135deg,#2563eb,#7c3aed);box-shadow:0 0 40px rgba(124,58,237,.3)">
+                <svg width="36" height="36" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+              </div>
+              <h2 class="text-xl font-bold text-white mb-1">Assistente de Voz BMS</h2>
+              <p class="text-slate-400 text-sm">Fale naturalmente em português. O edifício irá reagir.</p>
+            </div>
+            <!-- Wave animation -->
+            <div id="voicePageWave" class="voice-wave mb-4">
+              <div class="voice-bar" style="height:6px;background:#4c1d95"></div>
+              <div class="voice-bar" style="height:6px;background:#4c1d95"></div>
+              <div class="voice-bar" style="height:6px;background:#4c1d95"></div>
+              <div class="voice-bar" style="height:6px;background:#4c1d95"></div>
+              <div class="voice-bar" style="height:6px;background:#4c1d95"></div>
+              <div class="voice-bar" style="height:6px;background:#4c1d95"></div>
+              <div class="voice-bar" style="height:6px;background:#4c1d95"></div>
+            </div>
+            <button id="voicePageBtn" onclick="toggleVoicePage()" class="btn btn-primary px-8 py-3 text-base" style="background:linear-gradient(135deg,#2563eb,#7c3aed)">
+              🎤 Iniciar Escuta
+            </button>
+            <div id="voiceStatus" class="mt-3 text-sm text-slate-400">Clique para começar</div>
+          </div>
+
+          <!-- Command input manual -->
+          <div class="card mb-6">
+            <div class="text-sm font-semibold text-white mb-3">Escrever comando</div>
+            <div class="flex gap-2">
+              <input id="voiceTextInput" type="text" placeholder="Ex: Liga as luzes do piso 1..." onkeydown="if(event.key==='Enter')sendVoiceText()"/>
+              <button onclick="sendVoiceText()" class="btn btn-primary" style="white-space:nowrap;min-width:80px">Enviar</button>
+            </div>
+          </div>
+
+          <!-- Conversation -->
+          <div class="card mb-6">
+            <div class="flex items-center justify-between mb-3">
+              <div class="text-sm font-semibold text-white">Histórico de comandos</div>
+              <button onclick="clearVoiceLog()" class="text-xs text-slate-400 hover:text-white">Limpar</button>
+            </div>
+            <div id="voiceLogPage" class="space-y-2" style="min-height:80px">
+              <div class="text-xs text-slate-500 text-center py-4">Ainda sem comandos. Experimente falar ou escrever algo.</div>
+            </div>
+          </div>
+
+          <!-- Example commands -->
+          <div class="card">
+            <div class="text-sm font-semibold text-white mb-3">💡 Exemplos de comandos</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <button onclick="sendVoiceCommand(this.textContent)" class="text-left p-3 rounded-lg text-sm text-slate-300 hover:text-white transition" style="background:#0f172a;border:1px solid #334155">Liga todas as luzes</button>
+              <button onclick="sendVoiceCommand(this.textContent)" class="text-left p-3 rounded-lg text-sm text-slate-300 hover:text-white transition" style="background:#0f172a;border:1px solid #334155">Desliga as luzes do piso 3</button>
+              <button onclick="sendVoiceCommand(this.textContent)" class="text-left p-3 rounded-lg text-sm text-slate-300 hover:text-white transition" style="background:#0f172a;border:1px solid #334155">Ativa a ativação matinal</button>
+              <button onclick="sendVoiceCommand(this.textContent)" class="text-left p-3 rounded-lg text-sm text-slate-300 hover:text-white transition" style="background:#0f172a;border:1px solid #334155">Ativa o final do dia</button>
+              <button onclick="sendVoiceCommand(this.textContent)" class="text-left p-3 rounded-lg text-sm text-slate-300 hover:text-white transition" style="background:#0f172a;border:1px solid #334155">Qual é a temperatura do piso 1?</button>
+              <button onclick="sendVoiceCommand(this.textContent)" class="text-left p-3 rounded-lg text-sm text-slate-300 hover:text-white transition" style="background:#0f172a;border:1px solid #334155">Põe o AVAC a 21 graus</button>
+              <button onclick="sendVoiceCommand(this.textContent)" class="text-left p-3 rounded-lg text-sm text-slate-300 hover:text-white transition" style="background:#0f172a;border:1px solid #334155">Quantos alertas há?</button>
+              <button onclick="sendVoiceCommand(this.textContent)" class="text-left p-3 rounded-lg text-sm text-slate-300 hover:text-white transition" style="background:#0f172a;border:1px solid #334155">Ativa o evento na nave principal</button>
+              <button onclick="sendVoiceCommand(this.textContent)" class="text-left p-3 rounded-lg text-sm text-slate-300 hover:text-white transition" style="background:#0f172a;border:1px solid #334155">Mostra o consumo de energia</button>
+              <button onclick="sendVoiceCommand(this.textContent)" class="text-left p-3 rounded-lg text-sm text-slate-300 hover:text-white transition" style="background:#0f172a;border:1px solid #334155">Desliga tudo no piso 4</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SCENARIOS PAGE ==================== -->
+      <div id="page-scenarios" class="page animate-in">
+        <!-- Tabs -->
+        <div class="flex gap-1 mb-6 p-1 rounded-xl" style="background:#1e293b;width:fit-content">
+          <button id="tab-list" onclick="switchScenarioTab('list')" class="px-4 py-2 rounded-lg text-sm font-semibold transition" style="background:#2563eb;color:white">📋 Cenários</button>
+          <button id="tab-builder" onclick="switchScenarioTab('builder')" class="px-4 py-2 rounded-lg text-sm font-semibold transition text-slate-400 hover:text-white">⚡ Criar Cenário</button>
+          <button id="tab-schedules" onclick="switchScenarioTab('schedules')" class="px-4 py-2 rounded-lg text-sm font-semibold transition text-slate-400 hover:text-white">🕐 Agendamentos</button>
+        </div>
+
+        <!-- LIST tab -->
+        <div id="scenTab-list">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" id="scenariosList"></div>
+        </div>
+
+        <!-- BUILDER tab -->
+        <div id="scenTab-builder" class="hidden max-w-2xl">
+          <div class="card">
+            <h3 class="font-bold text-white text-base mb-6">Construtor de Cenário</h3>
+
+            <!-- Step 1: Basic info -->
+            <div class="mb-6">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="step-circle" style="background:#2563eb;color:white">1</div>
+                <span class="font-semibold text-white">Informação básica</span>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 ml-10">
+                <div><label class="text-xs text-slate-400 block mb-1">NOME DO CENÁRIO</label><input type="text" id="scen-name" placeholder="Ex: Modo Reunião"/></div>
+                <div><label class="text-xs text-slate-400 block mb-1">ÍCONE</label>
+                  <div class="flex gap-2">
+                    <span id="scenIconPick" class="text-2xl cursor-pointer p-2 rounded-lg" style="background:#0f172a;border:1px solid #334155">⚡</span>
+                    <div class="flex flex-wrap gap-1">
+                      <span onclick="pickIcon(this)" class="text-lg cursor-pointer p-1 rounded hover:bg-slate-700">🌅</span>
+                      <span onclick="pickIcon(this)" class="text-lg cursor-pointer p-1 rounded hover:bg-slate-700">🌙</span>
+                      <span onclick="pickIcon(this)" class="text-lg cursor-pointer p-1 rounded hover:bg-slate-700">🤝</span>
+                      <span onclick="pickIcon(this)" class="text-lg cursor-pointer p-1 rounded hover:bg-slate-700">🌿</span>
+                      <span onclick="pickIcon(this)" class="text-lg cursor-pointer p-1 rounded hover:bg-slate-700">🚨</span>
+                      <span onclick="pickIcon(this)" class="text-lg cursor-pointer p-1 rounded hover:bg-slate-700">☀️</span>
+                      <span onclick="pickIcon(this)" class="text-lg cursor-pointer p-1 rounded hover:bg-slate-700">🎬</span>
+                      <span onclick="pickIcon(this)" class="text-lg cursor-pointer p-1 rounded hover:bg-slate-700">🔇</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="sm:col-span-2"><label class="text-xs text-slate-400 block mb-1">DESCRIÇÃO</label><textarea id="scen-desc" rows="2" placeholder="Descreve o que este cenário faz..."></textarea></div>
+              </div>
+            </div>
+
+            <!-- Step 2: Trigger -->
+            <div class="mb-6">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="step-circle" style="background:#7c3aed;color:white">2</div>
+                <span class="font-semibold text-white">Como é ativado?</span>
+              </div>
+              <div class="grid grid-cols-3 gap-3 ml-10">
+                <label class="cursor-pointer">
+                  <input type="radio" name="trigger" value="MANUAL" class="hidden" checked onchange="showTriggerOpts(this.value)">
+                  <div class="trigger-opt p-3 rounded-xl text-center border-2 transition" style="border-color:#7c3aed;background:#7c3aed22" data-val="MANUAL">
+                    <div class="text-2xl mb-1">👆</div>
+                    <div class="text-xs font-semibold text-white">Manual</div>
+                    <div class="text-xs text-slate-400">Botão ou voz</div>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="trigger" value="SCHEDULED" class="hidden" onchange="showTriggerOpts(this.value)">
+                  <div class="trigger-opt p-3 rounded-xl text-center border-2 transition" style="border-color:#334155;background:#0f172a" data-val="SCHEDULED">
+                    <div class="text-2xl mb-1">🕐</div>
+                    <div class="text-xs font-semibold text-white">Agendado</div>
+                    <div class="text-xs text-slate-400">Hora/dia</div>
+                  </div>
+                </label>
+                <label class="cursor-pointer">
+                  <input type="radio" name="trigger" value="SENSOR" class="hidden" onchange="showTriggerOpts(this.value)">
+                  <div class="trigger-opt p-3 rounded-xl text-center border-2 transition" style="border-color:#334155;background:#0f172a" data-val="SENSOR">
+                    <div class="text-2xl mb-1">📡</div>
+                    <div class="text-xs font-semibold text-white">Sensor</div>
+                    <div class="text-xs text-slate-400">Automático</div>
+                  </div>
+                </label>
+              </div>
+              <div id="triggerOpts-SCHEDULED" class="ml-10 mt-3 hidden">
+                <div class="grid grid-cols-2 gap-3">
+                  <div><label class="text-xs text-slate-400 block mb-1">HORA DE INÍCIO</label><input type="time" value="08:00"/></div>
+                  <div><label class="text-xs text-slate-400 block mb-1">HORA DE FIM</label><input type="time" value="19:00"/></div>
+                  <div class="col-span-2"><label class="text-xs text-slate-400 block mb-1">DIAS DA SEMANA</label>
+                    <div class="flex gap-2">
+                      <span class="day-pill" onclick="toggleDay(this)">Seg</span><span class="day-pill" onclick="toggleDay(this)">Ter</span><span class="day-pill" onclick="toggleDay(this)">Qua</span><span class="day-pill" onclick="toggleDay(this)">Qui</span><span class="day-pill" onclick="toggleDay(this)">Sex</span><span class="day-pill text-slate-500" onclick="toggleDay(this)">Sáb</span><span class="day-pill text-slate-500" onclick="toggleDay(this)">Dom</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="triggerOpts-SENSOR" class="ml-10 mt-3 hidden">
+                <div class="grid grid-cols-2 gap-3">
+                  <div><label class="text-xs text-slate-400 block mb-1">SENSOR</label><select><option>Sensor CO₂ — Reuniões A</option><option>Sensor CO₂ — Open Space Piso 1</option><option>Sensor CO₂ — Open Space Piso 2</option><option>Sensor Presença — Piso 1</option><option>Sensor Presença — Piso 2</option><option>Sensor Presença — Piso 3</option><option>Sensor Temperatura — AVAC Geral</option><option>Sensor Luminosidade — Fachada</option><option>Sensor Humidade — Open Space</option><option>SCI — Detetor Fumo</option><option>SCI — Botão Emergência</option></select></div>
+                  <div><label class="text-xs text-slate-400 block mb-1">CONDIÇÃO</label><select><option>maior que</option><option>menor que</option><option>igual a</option></select></div>
+                  <div><label class="text-xs text-slate-400 block mb-1">VALOR</label><input type="number" placeholder="1000"/></div>
+                  <div><label class="text-xs text-slate-400 block mb-1">UNIDADE</label><input type="text" value="ppm" disabled style="opacity:.5"/></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3: Conditions (optional) -->
+            <div class="mb-6">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="step-circle" style="background:#0891b2;color:white">3</div>
+                <span class="font-semibold text-white">Condições <span class="text-slate-400 font-normal text-sm">(opcional)</span></span>
+              </div>
+              <div id="conditionsList" class="ml-10 space-y-2"></div>
+              <button onclick="addCondition()" class="ml-10 mt-2 text-xs text-blue-400 hover:text-blue-300">+ Adicionar condição</button>
+            </div>
+
+            <!-- Step 4: Actions -->
+            <div class="mb-6">
+              <div class="flex items-center gap-3 mb-4">
+                <div class="step-circle" style="background:#065f46;color:white">4</div>
+                <span class="font-semibold text-white">Ações <span class="text-red-400 text-sm">*</span></span>
+              </div>
+              <div id="actionsList" class="ml-10 space-y-2">
+                <div class="action-row">
+                  <select class="flex-1" style="min-width:0">
+                    <optgroup label="💡 Iluminação"><option>💡 Iluminação — Receção P0</option><option>💡 Iluminação — Open Space P1</option><option>💡 Iluminação — Open Space P2</option><option>💡 Iluminação — Open Space P3</option><option>💡 Iluminação — Sala Reuniões A</option><option>💡 Iluminação — Sala Reuniões B</option><option>💡 Iluminação — Cafetaria</option><option>💡 Iluminação — Fachada</option><option>💡 Iluminação — Parking</option><option>💡 Iluminação — Todos os pisos</option></optgroup>
+                    <optgroup label="🌡️ AVAC"><option>🌡️ AVAC — Open Space P1</option><option>🌡️ AVAC — Open Space P2</option><option>🌡️ AVAC — Open Space P3</option><option>🌡️ AVAC — Sala Reuniões A</option><option>🌡️ AVAC — Sala Reuniões B</option><option>🌡️ AVAC — Cafetaria</option><option>🌡️ AVAC — Data Center</option><option>🌡️ Ventilação — Renovação Ar</option><option>🌡️ AVAC — Todos</option></optgroup>
+                    <optgroup label="🔐 Segurança"><option>🔐 Alarme — Armar</option><option>🔐 Alarme — Desarmar</option><option>🔐 Câmeras — Modo Noturno</option><option>🔐 Controlo Acessos — Bloquear</option><option>🔐 Controlo Acessos — Desbloquear</option></optgroup>
+                    <optgroup label="🛗 Elevadores"><option>🛗 Elevadores — Chamar Piso 0</option><option>🛗 Elevadores — Bloquear</option></optgroup>
+                    <optgroup label="☀️ Energia"><option>☀️ Fotovoltaico — Prioridade Consumo</option><option>⚡ Equipamentos — Modo Eco</option></optgroup>
+                    <optgroup label="📢 Comunicação"><option>📢 Difusão Áudio — Protocolo Evacuação</option><option>⚠️ Alerta — Enviar Notificação</option></optgroup>
+                  </select>
+                  <select style="width:130px"><option>Ligar</option><option>Desligar</option><option>Dimmer 50%</option><option>Dimmer 75%</option><option>Máximo</option><option>Definir temp.</option></select>
+                  <input type="number" placeholder="--" style="width:60px;text-align:center"/>
+                  <button onclick="this.closest('.action-row').remove()" class="text-slate-500 hover:text-red-400 px-2">✕</button>
+                </div>
+              </div>
+              <button onclick="addAction()" class="ml-10 mt-2 text-xs text-blue-400 hover:text-blue-300">+ Adicionar ação</button>
+            </div>
+
+            <div class="flex gap-3 pt-4" style="border-top:1px solid #334155">
+              <button onclick="switchScenarioTab('list')" class="btn btn-ghost flex-1">Cancelar</button>
+              <button onclick="saveNewScenario()" class="btn btn-primary flex-1">💾 Guardar Cenário</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCHEDULES tab -->
+        <div id="scenTab-schedules" class="hidden">
+          <div class="card mb-4" style="background:linear-gradient(135deg,#1e293b,#1e1b4b);border-color:#4338ca33">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="text-2xl">🕐</div>
+              <div><div class="font-semibold text-white">Agendamentos Ativos</div><div class="text-xs text-slate-400">Cenários com execução automática programada</div></div>
+            </div>
+            <div class="space-y-3" id="schedulesList"></div>
+          </div>
+          <div class="text-xs text-slate-500 text-center">Os agendamentos são configurados ao criar ou editar um cenário</div>
+        </div>
+      </div>
+
+      <!-- ==================== LIGHTING ==================== -->
+      <div id="page-lighting" class="page animate-in">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="lightingZones"></div>
+      </div>
+
+      <!-- ==================== HVAC ==================== -->
+      <div id="page-hvac" class="page animate-in">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="hvacZones"></div>
+      </div>
+
+      <!-- ==================== SOLAR ==================== -->
+      <div id="page-solar" class="page animate-in">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="card"><div class="text-sm font-semibold text-white mb-2">Produção Solar — hoje</div><canvas id="solarChart" height="200"></canvas></div>
+          <div class="grid grid-cols-2 gap-4 content-start">
+            <div class="card"><div class="text-xs text-slate-400">PRODUÇÃO ATUAL</div><div class="text-2xl font-bold mt-1" style="color:#fbbf24" id="solarNow">45 kW</div></div>
+            <div class="card"><div class="text-xs text-slate-400">TOTAL HOJE</div><div class="text-2xl font-bold text-white mt-1">68 kWh</div></div>
+            <div class="card"><div class="text-xs text-slate-400">PAINÉIS ATIVOS</div><div class="text-2xl font-bold text-white mt-1">48/52</div></div>
+            <div class="card"><div class="text-xs text-slate-400">POUPANÇA CO₂</div><div class="text-2xl font-bold mt-1" style="color:#4ade80">34 kg</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== ELEVATOR ==================== -->
+      <div id="page-elevator" class="page animate-in">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="elevatorCards"></div>
+      </div>
+
+      <!-- ==================== ELECTRICAL ==================== -->
+      <div id="page-electrical" class="page animate-in">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="electricalCards"></div>
+      </div>
+
+      <!-- ==================== FIRE ==================== -->
+      <div id="page-fire" class="page animate-in">
+        <div class="mb-4 p-4 rounded-xl flex items-center gap-3" style="background:#052e16;border:1px solid #166534">
+          <span style="color:#4ade80;font-size:20px">✓</span>
+          <div><div class="font-semibold" style="color:#4ade80">Sistema SCI Normal</div><div class="text-xs text-slate-400">Todos os detetores a funcionar</div></div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="fireCards"></div>
+      </div>
+
+      <!-- ==================== WATER ==================== -->
+      <div id="page-water" class="page animate-in">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="card"><div class="text-sm font-semibold text-white mb-2">Consumo — semana</div><canvas id="waterChart" height="200"></canvas></div>
+          <div class="grid grid-cols-2 gap-4 content-start">
+            <div class="card"><div class="text-xs text-slate-400">CONSUMO HOJE</div><div class="text-2xl font-bold text-white mt-1">2.4 m³</div></div>
+            <div class="card"><div class="text-xs text-slate-400">PRESSÃO REDE</div><div class="text-2xl font-bold mt-1" style="color:#60a5fa">3.2 bar</div></div>
+            <div class="card"><div class="text-xs text-slate-400">BOMBAS ATIVAS</div><div class="text-2xl font-bold mt-1" style="color:#4ade80">2/3</div></div>
+            <div class="card"><div class="text-xs text-slate-400">TEMP. AQS</div><div class="text-2xl font-bold mt-1" style="color:#fbbf24">58°C</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== SECURITY ==================== -->
+      <div id="page-security" class="page animate-in">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="securityCards"></div>
+      </div>
+
+      <!-- ==================== ALERTS ==================== -->
+      <div id="page-alerts" class="page animate-in">
+        <div class="flex gap-2 mb-4 flex-wrap">
+          <button onclick="filterAlerts('ALL')" class="btn btn-primary btn-sm" id="fa-ALL">Todos</button>
+          <button onclick="filterAlerts('CRITICAL')" class="btn btn-ghost btn-sm" id="fa-CRITICAL">Crítico</button>
+          <button onclick="filterAlerts('WARNING')" class="btn btn-ghost btn-sm" id="fa-WARNING">Aviso</button>
+          <button onclick="filterAlerts('INFO')" class="btn btn-ghost btn-sm" id="fa-INFO">Info</button>
+        </div>
+        <div id="alertsFull" class="space-y-2"></div>
+      </div>
+
+      <!-- ==================== REPORTS ==================== -->
+      <div id="page-reports" class="page animate-in">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="card"><div class="text-sm font-semibold text-white mb-2">Consumo por Sistema — 30 dias</div><canvas id="reportChart" height="220"></canvas></div>
+          <div class="card"><div class="text-sm font-semibold text-white mb-4">Disponibilidade</div><div id="uptimeTable" class="space-y-3"></div></div>
+        </div>
+      </div>
+
+      <!-- ==================== USERS ==================== -->
+      <div id="page-users" class="page animate-in">
+        <div class="flex justify-between items-center mb-4">
+          <div class="text-slate-400 text-sm">Gestão de utilizadores e permissões</div>
+          <button class="btn btn-primary">+ Novo Utilizador</button>
+        </div>
+        <div class="card overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead><tr class="text-left text-xs text-slate-400 border-b border-slate-700"><th class="pb-3">UTILIZADOR</th><th class="pb-3">EMAIL</th><th class="pb-3">PAPEL</th><th class="pb-3">ESTADO</th><th class="pb-3">ÚLTIMO ACESSO</th><th class="pb-3"></th></tr></thead>
+            <tbody id="usersTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ==================== VOICE FLOATING PANEL ==================== -->
+<button id="voiceFloatBtn" class="voice-btn hidden" onclick="toggleVoicePanel()">
+  <svg width="26" height="26" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+</button>
+
+<div id="voicePanel" class="voice-panel">
+  <div class="p-4" style="border-bottom:1px solid #334155">
+    <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full" id="vpStatusDot" style="background:#334155"></div>
+        <span class="text-sm font-semibold text-white">Assistente BMS</span>
+      </div>
+      <button onclick="toggleVoicePanel()" class="text-slate-400 hover:text-white text-lg">✕</button>
+    </div>
+    <div class="voice-wave" id="vpWave">
+      <div class="voice-bar" style="height:6px"></div>
+      <div class="voice-bar" style="height:6px"></div>
+      <div class="voice-bar" style="height:6px"></div>
+      <div class="voice-bar" style="height:6px"></div>
+      <div class="voice-bar" style="height:6px"></div>
+    </div>
+  </div>
+  <div class="p-3 voice-log" id="vpLog">
+    <div class="text-xs text-slate-500 text-center py-2">Diga um comando ou escreva abaixo</div>
+  </div>
+  <div class="p-3" style="border-top:1px solid #334155">
+    <div class="flex gap-2">
+      <input id="vpTextInput" type="text" placeholder="Escreva um comando..." style="font-size:13px;padding:7px 10px" onkeydown="if(event.key==='Enter')sendVoiceText()"/>
+      <button onclick="startListening()" id="vpMicBtn" class="btn btn-primary px-3" title="Microfone">🎤</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.day-pill{padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #334155;color:#f1f5f9;background:#1e293b;user-select:none;}
+.day-pill.active{background:#2563eb;border-color:#2563eb;color:white;}
+</style>
+
+<script>
+// ============================================================
+// STATE & DATA
+// ============================================================
+const S = { alertFilter:'ALL', voicePanelOpen:false, voiceListening:false, scenarioTab:'list', charts:{} };
+
+const systems=[
+  {id:'lighting',icon:'💡',name:'Iluminação',metric:'24/28 online',status:'ok'},
+  {id:'hvac',icon:'🌡️',name:'AVAC',metric:'22.4°C avg',status:'ok'},
+  {id:'solar',icon:'☀️',name:'Fotovoltaico',metric:'45 kW agora',status:'ok'},
+  {id:'elevator',icon:'🛗',name:'Elevadores',metric:'2/3 ativos',status:'warn'},
+  {id:'electrical',icon:'⚡',name:'Elétrico',metric:'284 kW',status:'ok'},
+  {id:'fire',icon:'🔥',name:'SCI',metric:'Tudo normal',status:'ok'},
+  {id:'water',icon:'💧',name:'Hidráulica',metric:'2.4 m³/dia',status:'ok'},
+  {id:'security',icon:'🔐',name:'Segurança',metric:'12 câmeras OK',status:'ok'},
+];
+
+const alerts=[
+  {id:1,sev:'CRITICAL',msg:'Elevador 2 — Falha de comunicação',sys:'Elevadores',time:'10:32',acked:false},
+  {id:2,sev:'WARNING',msg:'Consumo elétrico acima do normal — Piso 3',sys:'Elétrico',time:'09:55',acked:false},
+  {id:3,sev:'WARNING',msg:'Sensor CO₂ Sala de Reuniões A — Valor elevado (1200ppm)',sys:'AVAC',time:'09:12',acked:false},
+  {id:4,sev:'INFO',msg:'Cenário "Modo Noite" ativado automaticamente',sys:'Sistema',time:'00:00',acked:true},
+  {id:5,sev:'INFO',msg:'Backup da base de dados concluído',sys:'Sistema',time:'03:00',acked:true},
+];
+
+const scenarios=[
+  {id:1,icon:'🌅',name:'Ativação Matinal',desc:'05h30 — AVAC inicia pré-aquecimento com base na temperatura externa e interna. 09h00 — Iluminação ajustada para níveis laborais, sistemas de monitorização ativos, alarme desarmado.',trigger:'SCHEDULED',active:true,lastRun:'Hoje 09:00',
+   schedule:'Seg–Sex · 05h30 e 09h00',
+   conditions:['Dia útil (Seg–Sex)'],
+   actions:['🌡️ AVAC Todos → Pré-aquecimento 18°C (05h30)','🌡️ AVAC Todos → 22°C (09h00)','💡 Iluminação Áreas Trabalho → 100% (09h00)','💡 Iluminação Descanso → 60% (09h00)','🔐 Alarme → Desarmar (09h00)','📊 Monitorização Ocupação → Ativar']},
+  {id:2,icon:'⚡',name:'Gestão Energética Diária',desc:'Sensores de presença desligam luzes após 5 min de inatividade. Dimming automático conforme luz natural. Sensores CO₂ ajustam ventilação em salas com alta ocupação. Temperatura ajustada dinamicamente.',trigger:'SENSOR',active:true,lastRun:'Contínuo',
+   schedule:'Contínuo em horário laboral',
+   conditions:['Horário laboral 08h–19h','Sensor presença = inativo > 5 min','Sensor CO₂ > 800 ppm','Sensor luz natural variável'],
+   actions:['💡 Zona sem movimento → Desligar (5 min)','💡 Dimmer → Ajuste automático luz natural','🌡️ Ventilação → Aumentar se CO₂ > 800 ppm','🌡️ Temperatura → Ajuste dinâmico previsão tempo','📊 Consumo → Relatório em tempo real']},
+  {id:3,icon:'🤝',name:'Sala de Reunião Inteligente',desc:'Colaboradores reservam salas via PC ou painéis digitais. Se nenhum colaborador comparecer em 15 min, reserva é cancelada automaticamente. AVAC e iluminação ajustados para conforto térmico.',trigger:'SENSOR',active:false,lastRun:'Hoje 14:30',
+   schedule:'Por reserva',
+   conditions:['Reserva de sala confirmada','Sensor presença = ativado (entrada)','Sensor presença = sem movimento > 15 min'],
+   actions:['💡 Iluminação Sala → Dimmer 70%','🌡️ AVAC Sala → 21°C','🌡️ Ventilação → Aumentar (ocupação)','💡 Iluminação Sala → Desligar se vazio 15 min','🌡️ AVAC Sala → Standby se vazio 15 min']},
+  {id:4,icon:'🌆',name:'Final do Dia',desc:'18h00 — Iluminação reduzida progressivamente nas áreas de trabalho. Iluminação de fachada ativada. 22h00 — Toda a iluminação interior desligada, AVAC desligado. Equipamentos em modo de economia.',trigger:'SCHEDULED',active:true,lastRun:'Ontem 18:00',
+   schedule:'Diário · 18h00 e 22h00',
+   conditions:['Dia útil'],
+   actions:['💡 Áreas Trabalho → Dimmer 30% (18h)','💡 Fachada → Ligar (18h)','🌡️ AVAC → Mínimo (18h)','⚡ Equipamentos → Modo Eco (18h)','💡 Iluminação Interior → Desligar tudo (22h)','🌡️ AVAC → Desligar (22h)','🔐 Alarme → Armar (22h)']},
+  {id:5,icon:'🌙',name:'Gestão Noturna',desc:'Sensores de movimento ativam iluminação apenas nas áreas necessárias. Câmeras com visão noturna controladas remotamente. Relatórios de ocupação gerados para equipa de segurança.',trigger:'SENSOR',active:true,lastRun:'Hoje 00:00',
+   schedule:'Diário · 22h00 – 05h30',
+   conditions:['Hora > 22h00 ou < 05h30','Sensor movimento = ativado'],
+   actions:['💡 Zona com movimento → Ligar (mínimo)','💡 Zona sem movimento → Manter desligada','🔐 Câmeras → Modo visão noturna','📊 Relatório Ocupação → Gerar para segurança','🌡️ AVAC → Desligado (exceto Data Center)']},
+  {id:6,icon:'🚨',name:'Evacuação de Emergência',desc:'Ativado pelo SCI (Sistema de Combate a Incêndios) ou manualmente. Iluminação máxima em todas as áreas, elevadores ao piso 0, alarme geral, difusão de áudio com indicação de saídas seguras.',trigger:'SENSOR',active:false,lastRun:'Nunca',
+   schedule:'Imediato quando ativado',
+   conditions:['SCI Detetor fumo = ativado','OU Botão de emergência ativado'],
+   actions:['💡 Iluminação Todos → Máximo (imediato)','🛗 Elevadores → Piso 0 (imediato)','🔐 Alarme → Máximo','📢 Difusão áudio → Ativar protocolo evacuação','🚒 Notificação → Enviar para segurança e bombeiros','📊 Relatório → Pessoas no edifício em tempo real']},
+  {id:7,icon:'🌿',name:'Modo Eco Energético',desc:'Minimiza consumo sem comprometer áreas críticas. Zonas não ocupadas desligadas, AVAC em standby, prioridade à energia fotovoltaica. Indicado para fins de semana e feriados.',trigger:'MANUAL',active:false,lastRun:'Sábado 08:00',
+   schedule:'Manual ou fins de semana',
+   conditions:['Ativação manual','OU Fim de semana/feriado'],
+   actions:['💡 Zonas não ocupadas → Desligar','🌡️ AVAC → Standby (exceto Data Center)','☀️ Fotovoltaico → Prioridade consumo','⚡ Equipamentos não críticos → Desligar','📊 Monitorização → Manter ativa']},
+  {id:8,icon:'🌬️',name:'Qualidade do Ar',desc:'Sensores CO₂, humidade e partículas monitorizam em tempo real. Automação da ventilação para manter qualidade do ar dentro dos parâmetros. Alertas automáticos quando qualidade baixa.',trigger:'SENSOR',active:true,lastRun:'Contínuo',
+   schedule:'Contínuo',
+   conditions:['CO₂ > 1000 ppm','OU Humidade > 70%','OU Partículas > limite'],
+   actions:['🌡️ Ventilação → Aumentar caudal','🌡️ Renovação ar → Ativar','⚠️ Alerta → Enviar notificação equipa','📊 Log → Registar evento qualidade ar']},
+  {id:9,icon:'🎭',name:'Evento — Nave Principal',desc:'Ativa o perfil completo de evento na nave principal. Iluminação de espetáculo, AVAC reforçado para alta ocupação, sistemas audiovisuais ligados, controlo de acessos adaptado. Ativar 30 min antes do início do evento.',trigger:'MANUAL',active:false,lastRun:'Nunca',
+   schedule:'Manual · ativar 30 min antes do evento',
+   conditions:['Ativação manual pelo operador'],
+   actions:['💡 Nave Principal → Iluminação 100% (perfil evento)','💡 Fachada → Ligar (sinalização)','💡 Receção/Acessos → 100%','🌡️ AVAC Nave → Alta ocupação (20°C)','🌡️ Ventilação → Caudal máximo','🔐 Alarme → Parcialmente desarmado (zona evento)','🔐 Controlo Acessos → Modo evento (entradas abertas)','📢 Difusão áudio → Música ambiente (nível 1)','⚡ Sistemas AV → Ligar','🛗 Elevadores → Todos operacionais','📊 Monitorização Ocupação → Ativa (lotação máx.)']},
+];
+
+const lightingZones=[
+  {name:'Receção Piso 0',zone:'Piso 0',on:true,level:80},
+  {name:'Open Space Piso 1',zone:'Piso 1',on:true,level:100},
+  {name:'Sala Reuniões A',zone:'Piso 1',on:false,level:60},
+  {name:'Sala Reuniões B',zone:'Piso 1',on:true,level:70},
+  {name:'Open Space Piso 2',zone:'Piso 2',on:true,level:90},
+  {name:'Cafetaria',zone:'Piso 0',on:true,level:85},
+  {name:'Corredor Piso 3',zone:'Piso 3',on:false,level:50},
+  {name:'Open Space Piso 3',zone:'Piso 3',on:true,level:100},
+  {name:'Parking',zone:'Cave',on:true,level:60},
+];
+
+const hvacZones=[
+  {name:'Open Space Piso 1',temp:22.4,set:22,mode:'cooling',on:true},
+  {name:'Open Space Piso 2',temp:23.1,set:22,mode:'cooling',on:true},
+  {name:'Open Space Piso 3',temp:21.8,set:22,mode:'off',on:false},
+  {name:'Sala Reuniões A',temp:24.2,set:21,mode:'cooling',on:true},
+  {name:'Sala Reuniões B',temp:22.0,set:22,mode:'cooling',on:true},
+  {name:'Cafetaria',temp:23.5,set:23,mode:'off',on:true},
+];
+
+const elevators=[
+  {name:'Elevador 1',floor:3,dir:'↑',status:'ok',doors:'fechado'},
+  {name:'Elevador 2',floor:0,dir:'—',status:'error',doors:'bloqueado'},
+  {name:'Elevador 3',floor:1,dir:'↓',status:'ok',doors:'fechado'},
+  {name:'Elevador S. Carga',floor:0,dir:'—',status:'maintenance',doors:'aberto'},
+];
+
+const floors=[
+  {n:'Piso 4',zones:['Arquivo','Técnico'],ok:5,warn:0},
+  {n:'Piso 3',zones:['Open Space','Reuniões'],ok:8,warn:1},
+  {n:'Piso 2',zones:['Open Space','Direção'],ok:7,warn:0},
+  {n:'Piso 1',zones:['Open Space','Reuniões A/B'],ok:9,warn:1},
+  {n:'Piso 0',zones:['Receção','Cafetaria'],ok:6,warn:0},
+  {n:'Cave',zones:['Parking','Técnico'],ok:4,warn:0},
+];
+
+const users=[
+  {name:'Miguel Valerio',email:'admin@coimbra-bms.pt',role:'ADMIN',active:true,last:'Agora'},
+  {name:'Ana Santos',email:'manager@coimbra-bms.pt',role:'MANAGER',active:true,last:'Há 2h'},
+  {name:'Carlos Lima',email:'operator@coimbra-bms.pt',role:'OPERATOR',active:true,last:'Há 1 dia'},
+  {name:'Sofia Ferreira',email:'viewer@coimbra-bms.pt',role:'VIEWER',active:false,last:'Há 1 semana'},
+  {name:'Rui Oliveira',email:'maintenance@coimbra-bms.pt',role:'MAINTENANCE',active:true,last:'Há 3 dias'},
+];
+
+const schedules=[
+  {scenario:'Ativação Matinal',icon:'🌅',cron:'Seg–Sex · 05h30 e 09h00',next:'Amanhã 05:30',active:true},
+  {scenario:'Final do Dia',icon:'🌆',cron:'Diário · 18h00 e 22h00',next:'Hoje 18:00',active:true},
+  {scenario:'Gestão Noturna',icon:'🌙',cron:'Diário · 22h00 – 05h30',next:'Hoje 22:00',active:true},
+  {scenario:'Gestão Energética Diária',icon:'⚡',cron:'Contínuo · Seg–Sex 08h–19h',next:'Seg 08:00',active:true},
+];
+
+// ============================================================
+// HELPERS
+// ============================================================
+const sevColor={CRITICAL:'#f87171',WARNING:'#fbbf24',INFO:'#60a5fa',EMERGENCY:'#f43f5e'};
+const sevBg={CRITICAL:'#450a0a',WARNING:'#451a03',INFO:'#0c1a2e',EMERGENCY:'#4c0519'};
+const roleBadgeColor={ADMIN:'#7c3aed',MANAGER:'#0e7490',OPERATOR:'#065f46',VIEWER:'#374151',MAINTENANCE:'#78350f'};
+const triggerLabel={MANUAL:'Manual',SCHEDULED:'Agendado',SENSOR:'Sensor'};
+const triggerColor={MANUAL:'#6366f1',SCHEDULED:'#0891b2',SENSOR:'#d97706'};
+function statusDot(s){const c={ok:'#4ade80',warn:'#fbbf24',error:'#f87171',maintenance:'#94a3b8'};return`<span class="dot" style="background:${c[s]||'#94a3b8'}"></span>`;}
+function initials(n){return n.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();}
+
+// ============================================================
+// AUTH
+// ============================================================
+function doLogin(){
+  const e=document.getElementById('loginEmail').value;
+  if(!e.includes('@')){const err=document.getElementById('loginError');err.textContent='Email inválido';err.classList.remove('hidden');return;}
+  document.getElementById('loginPage').classList.remove('active');
+  document.getElementById('appShell').classList.add('active');
+  document.getElementById('voiceFloatBtn').classList.remove('hidden');
+  initApp();
+}
+function doLogout(){document.getElementById('appShell').classList.remove('active');document.getElementById('loginPage').classList.add('active');document.getElementById('voiceFloatBtn').classList.add('hidden');}
+document.getElementById('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');
+  const titles={dashboard:'Dashboard',voice:'Assistente de Voz',lighting:'Iluminação',hvac:'AVAC',solar:'Fotovoltaico',elevator:'Elevadores',electrical:'Elétrico',fire:'SCI — Segurança Contra Incêndios',water:'Redes Hidráulicas',security:'Segurança',scenarios:'Cenários',alerts:'Alertas',reports:'Relatórios',users:'Utilizadores'};
+  document.getElementById('pageTitle').textContent=titles[id]||id;
+  if(id==='solar')initSolarChart();
+  if(id==='water')initWaterChart();
+  if(id==='reports')initReportChart();
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderSystemsGrid(){
+  document.getElementById('systemsGrid').innerHTML=systems.map(s=>`
+    <div class="p-3 rounded-xl cursor-pointer hover:opacity-80 transition" style="background:#0f172a;border:1px solid #334155" onclick="showPage('${s.id}',null)">
+      <div class="flex items-center justify-between mb-2"><span style="font-size:20px">${s.icon}</span>${statusDot(s.status)}</div>
+      <div class="text-xs font-semibold text-white">${s.name}</div>
+      <div class="text-xs text-slate-400 mt-1">${s.metric}</div>
+    </div>`).join('');
+}
+
+function renderAlertsList(){
+  document.getElementById('alertsList').innerHTML=alerts.slice(0,4).map(a=>`
+    <div class="flex items-start gap-3 p-2 rounded-lg" style="background:${sevBg[a.sev]}">
+      <div class="dot mt-1" style="background:${sevColor[a.sev]};min-width:8px"></div>
+      <div class="flex-1 min-w-0"><div class="text-xs text-white truncate">${a.msg}</div><div class="text-xs text-slate-400">${a.sys} · ${a.time}</div></div>
+    </div>`).join('');
+}
+
+function renderFloorMap(){
+  document.getElementById('floorMap').innerHTML=floors.map(f=>`
+    <div class="flex items-center gap-3">
+      <div class="text-xs font-semibold text-slate-400 w-12">${f.n}</div>
+      <div class="flex-1 rounded" style="background:#0f172a;padding:6px 10px;border:1px solid #334155">
+        <div class="flex items-center justify-between">
+          <div class="text-xs text-white">${f.zones.join(' · ')}</div>
+          <div class="flex items-center gap-2"><span class="text-xs" style="color:#4ade80">${f.ok} ✓</span>${f.warn>0?`<span class="text-xs" style="color:#fbbf24">${f.warn} ⚠</span>`:''}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderLighting(){
+  document.getElementById('lightingZones').innerHTML=lightingZones.map((z,i)=>`
+    <div class="card" id="lz-${i}">
+      <div class="flex items-center justify-between mb-3">
+        <div><div class="font-semibold text-white text-sm">${z.name}</div><div class="text-xs text-slate-400">${z.zone}</div></div>
+        <div class="toggle ${z.on?'on':''}" onclick="toggleLight(${i},this)"></div>
+      </div>
+      <div class="mb-1 flex justify-between"><span class="text-xs text-slate-400">Intensidade</span><span class="text-xs text-white" id="lv-${i}">${z.level}%</span></div>
+      <input type="range" class="slider w-full" min="0" max="100" value="${z.level}" oninput="setLightLevel(${i},this.value)" ${!z.on?'disabled':''}/>
+      <div class="mt-2 text-xs ${z.on?'text-yellow-400':'text-slate-500'}">${z.on?'● Ligada':'○ Desligada'}</div>
+    </div>`).join('');
+}
+function toggleLight(i,el){lightingZones[i].on=!lightingZones[i].on;el.classList.toggle('on');const card=document.getElementById('lz-'+i);card.querySelector('.text-xs:last-child').textContent=lightingZones[i].on?'● Ligada':'○ Desligada';card.querySelector('.text-xs:last-child').className='mt-2 text-xs '+(lightingZones[i].on?'text-yellow-400':'text-slate-500');card.querySelector('input[type=range]').disabled=!lightingZones[i].on;}
+function setLightLevel(i,v){lightingZones[i].level=v;document.getElementById('lv-'+i).textContent=v+'%';}
+
+function renderHVAC(){
+  document.getElementById('hvacZones').innerHTML=hvacZones.map((z,i)=>`
+    <div class="card">
+      <div class="flex items-center justify-between mb-3">
+        <div><div class="font-semibold text-white text-sm">${z.name}</div><div class="text-xs text-slate-400">${z.on?'A climatizar':'Desligado'}</div></div>
+        <div class="toggle ${z.on?'on':''}" onclick="this.classList.toggle('on')"></div>
+      </div>
+      <div class="flex items-end gap-3 mb-3">
+        <div><div class="text-xs text-slate-400">ATUAL</div><div class="text-3xl font-bold" style="color:${z.temp>23?'#f87171':'#60a5fa'}">${z.temp}°</div></div>
+        <div class="flex-1"><div class="text-xs text-slate-400 mb-1" id="hset-${i}">SETPOINT: ${z.set}°C</div><input type="range" class="slider w-full" min="16" max="30" value="${z.set}" oninput="document.getElementById('hset-${i}').textContent='SETPOINT: '+this.value+'°C'"/></div>
+      </div>
+      <div class="flex gap-2">
+        ${['cooling','heating','fan','off'].map(m=>`<button class="flex-1 text-xs py-1 rounded ${z.mode===m?'':'opacity-40'}" style="background:${z.mode===m?'#1d4ed8':'#334155'};color:white">${{cooling:'❄️',heating:'🔥',fan:'💨',off:'⏹'}[m]}</button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function renderElevators(){
+  document.getElementById('elevatorCards').innerHTML=elevators.map(e=>`
+    <div class="card text-center">
+      <div class="text-4xl mb-3">🛗</div>
+      <div class="font-semibold text-white">${e.name}</div>
+      <div class="mt-3 mb-3">
+        <div class="text-5xl font-bold ${e.status==='error'?'text-red-400':e.status==='maintenance'?'text-slate-400':'text-white'}">${e.status==='error'||e.status==='maintenance'?'—':e.floor}</div>
+        <div class="text-xs text-slate-400 mt-1">${e.status==='error'?'Piso desconhecido':e.status==='maintenance'?'Em manutenção':'Piso atual'}</div>
+      </div>
+      <span class="badge" style="background:${sevBg[{ok:'INFO',warn:'WARNING',error:'CRITICAL',maintenance:'INFO'}[e.status]]};color:${sevColor[{ok:'INFO',warn:'WARNING',error:'CRITICAL',maintenance:'INFO'}[e.status]]}">${{ok:'OPERACIONAL',warn:'AVISO',error:'FALHA',maintenance:'MANUTENÇÃO'}[e.status]}</span>
+      <div class="text-xs text-slate-400 mt-2">Portas: ${e.doors}${e.dir!=='—'?' · Dir: '+e.dir:''}</div>
+    </div>`).join('');
+}
+
+function renderElectrical(){
+  const panels=[
+    {name:'Quadro Geral',zone:'Cave',load:284,cap:400,status:'ok'},
+    {name:'QE Piso 1',zone:'Piso 1',load:82,cap:120,status:'ok'},
+    {name:'QE Piso 2',zone:'Piso 2',load:91,cap:120,status:'warn'},
+    {name:'QE Piso 3',zone:'Piso 3',load:67,cap:120,status:'ok'},
+    {name:'QE Piso 4',zone:'Piso 4',load:44,cap:100,status:'ok'},
+    {name:'QE Cave',zone:'Cave',load:38,cap:80,status:'ok'},
+  ];
+  document.getElementById('electricalCards').innerHTML=panels.map(p=>`
+    <div class="card">
+      <div class="flex items-center justify-between mb-2"><div><div class="font-semibold text-white text-sm">${p.name}</div><div class="text-xs text-slate-400">${p.zone}</div></div>${statusDot(p.status)}</div>
+      <div class="flex justify-between text-sm mb-1"><span class="text-slate-400">Carga</span><span class="text-white font-semibold">${p.load}/${p.cap} kW</span></div>
+      <div class="w-full rounded-full h-2" style="background:#334155"><div class="h-2 rounded-full" style="width:${Math.round(p.load/p.cap*100)}%;background:${p.load/p.cap>.8?'#ef4444':p.load/p.cap>.6?'#f59e0b':'#4ade80'}"></div></div>
+      <div class="text-xs text-slate-400 mt-1">${Math.round(p.load/p.cap*100)}% da capacidade</div>
+    </div>`).join('');
+}
+
+function renderFire(){
+  const detectors=['Detetor Fumo — Rec.','Detetor Fumo — Café','Detetor Fumo — OS P1','Detetor Calor — Coz.','Sprinkler P1','Sprinkler P2','Botão Emergência','Sirene Geral','Detetor CO — Parking'];
+  document.getElementById('fireCards').innerHTML=detectors.map(d=>`
+    <div class="card flex items-center gap-4"><div class="text-2xl">🔥</div><div class="flex-1"><div class="font-semibold text-white text-sm">${d}</div></div><span class="badge" style="background:#052e16;color:#4ade80">NORMAL</span></div>`).join('');
+}
+
+function renderSecurity(){
+  const cameras=['Câmera Entrada Principal','Câmera Receção','Câmera Parking A','Câmera Parking B','Câmera Corredor P1','Câmera Corredor P2','Acesso Principal','Acesso Parking','Acesso Servidor'];
+  document.getElementById('securityCards').innerHTML=cameras.map((c,i)=>`
+    <div class="card flex items-center gap-4"><div class="text-2xl">${i>5?'🔑':'📷'}</div><div class="flex-1"><div class="font-semibold text-white text-sm">${c}</div><div class="text-xs text-slate-400">${i>5?'Controlo Acesso':'CCTV'}</div></div><span class="badge" style="background:${i===3?'#451a03':'#052e16'};color:${i===3?'#fbbf24':'#4ade80'}">${i===3?'AVISO':'OK'}</span></div>`).join('');
+}
+
+function renderScenarios(){
+  document.getElementById('scenariosList').innerHTML=scenarios.map(s=>`
+    <div class="scenario-card ${s.active?'active-scenario':''}">
+      <div class="p-4">
+        <div class="flex items-start justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">${s.icon}</span>
+            <div>
+              <div class="font-semibold text-white">${s.name}</div>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span class="trigger-chip" style="background:${triggerColor[s.trigger]}22;color:${triggerColor[s.trigger]}">${{MANUAL:'👆 Manual',SCHEDULED:'🕐 Agendado',SENSOR:'📡 Sensor'}[s.trigger]}</span>
+              </div>
+            </div>
+          </div>
+          <div class="toggle ${s.active?'on':''}" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <p class="text-xs text-slate-400 mb-3">${s.desc}</p>
+        ${s.actions.length?`<div class="mb-3"><div class="text-xs text-slate-500 mb-1">AÇÕES (${s.actions.length})</div><div class="flex flex-wrap gap-1">${s.actions.map(a=>`<span class="text-xs px-2 py-0.5 rounded" style="background:#0f172a;color:#94a3b8;border:1px solid #334155">${a}</span>`).join('')}</div></div>`:''}
+      </div>
+      <div class="flex items-center justify-between px-4 py-2" style="border-top:1px solid #334155;background:#0f172a1a">
+        <div class="text-xs text-slate-400">Última: ${s.lastRun}</div>
+        <div class="flex gap-2">
+          <button onclick="editScenario(${s.id})" class="btn btn-ghost btn-sm">✏️ Editar</button>
+          <button onclick="activateScenario('${s.name}',this)" class="btn btn-primary btn-sm">▶ Ativar</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderSchedules(){
+  document.getElementById('schedulesList').innerHTML=schedules.map(s=>`
+    <div class="flex items-center gap-4 p-3 rounded-xl" style="background:#0f172a;border:1px solid #334155">
+      <div class="text-xl">${s.icon}</div>
+      <div class="flex-1"><div class="font-semibold text-white text-sm">${s.scenario}</div><div class="text-xs text-slate-400">🕐 ${s.cron} · Próximo: ${s.next}</div></div>
+      <div class="toggle ${s.active?'on':''}" onclick="this.classList.toggle('on')"></div>
+    </div>`).join('');
+}
+
+function renderAlertsFull(){
+  const filtered=S.alertFilter==='ALL'?alerts:alerts.filter(a=>a.sev===S.alertFilter);
+  document.getElementById('alertsFull').innerHTML=filtered.map(a=>`
+    <div class="card flex items-start gap-4" style="${a.acked?'opacity:.55':''}">
+      <div class="p-2 rounded-lg mt-1" style="background:${sevBg[a.sev]}"><div class="dot" style="background:${sevColor[a.sev]}"></div></div>
+      <div class="flex-1">
+        <div class="flex items-center gap-2 mb-1"><span class="badge" style="background:${sevBg[a.sev]};color:${sevColor[a.sev]}">${a.sev}</span><span class="text-xs text-slate-400">${a.sys} · ${a.time}</span></div>
+        <div class="text-sm text-white">${a.msg}</div>
+      </div>
+      ${!a.acked?`<button class="btn btn-ghost btn-sm" onclick="ackAlert(${a.id})">Reconhecer</button>`:'<span class="text-xs text-slate-500">✓ Rec.</span>'}
+    </div>`).join('');
+}
+function ackAlert(id){const a=alerts.find(x=>x.id===id);if(a){a.acked=true;renderAlertsFull();}}
+function filterAlerts(f){S.alertFilter=f;['ALL','CRITICAL','WARNING','INFO'].forEach(x=>{const b=document.getElementById('fa-'+x);b.className='btn btn-sm '+(x===f?'btn-primary':'btn-ghost');});renderAlertsFull();}
+
+function renderUsers(){
+  document.getElementById('usersTable').innerHTML=users.map(u=>`
+    <tr class="border-b border-slate-800">
+      <td class="py-3"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background:#1d4ed8">${initials(u.name)}</div><span class="text-white text-sm">${u.name}</span></div></td>
+      <td class="py-3 text-slate-400 text-sm">${u.email}</td>
+      <td class="py-3"><span class="badge" style="background:${roleBadgeColor[u.role]}33;color:${roleBadgeColor[u.role]}">${u.role}</span></td>
+      <td class="py-3"><span class="badge" style="background:${u.active?'#052e16':'#1e293b'};color:${u.active?'#4ade80':'#94a3b8'}">${u.active?'ATIVO':'INATIVO'}</span></td>
+      <td class="py-3 text-slate-400 text-sm">${u.last}</td>
+      <td class="py-3"><button class="text-xs text-blue-400">Editar</button></td>
+    </tr>`).join('');
+}
+
+function renderUptime(){
+  const data=[{name:'Iluminação',pct:99.8},{name:'AVAC',pct:99.2},{name:'Fotovoltaico',pct:97.4},{name:'Elevadores',pct:94.1},{name:'Elétrico',pct:99.9},{name:'SCI',pct:100},{name:'Hidráulica',pct:98.7},{name:'Segurança',pct:99.5}];
+  document.getElementById('uptimeTable').innerHTML=data.map(d=>`
+    <div>
+      <div class="flex justify-between text-sm mb-1"><span class="text-white">${d.name}</span><span class="font-semibold" style="color:${d.pct>=99?'#4ade80':d.pct>=95?'#fbbf24':'#f87171'}">${d.pct}%</span></div>
+      <div class="w-full rounded-full h-1.5" style="background:#334155"><div class="h-1.5 rounded-full" style="width:${d.pct}%;background:${d.pct>=99?'#4ade80':d.pct>=95?'#fbbf24':'#f87171'}"></div></div>
+    </div>`).join('');
+}
+
+// ============================================================
+// SCENARIO BUILDER
+// ============================================================
+function switchScenarioTab(tab){
+  S.scenarioTab=tab;
+  ['list','builder','schedules'].forEach(t=>{
+    document.getElementById('scenTab-'+t).classList.toggle('hidden',t!==tab);
+    const btn=document.getElementById('tab-'+t);
+    btn.style.background=t===tab?'#2563eb':'';btn.style.color=t===tab?'white':'';btn.className='px-4 py-2 rounded-lg text-sm font-semibold transition '+(t===tab?'':'text-slate-400 hover:text-white');
+  });
+  if(tab==='list')renderScenarios();
+  if(tab==='schedules')renderSchedules();
+}
+
+function pickIcon(el){document.getElementById('scenIconPick').textContent=el.textContent;}
+function toggleDay(el){el.classList.toggle('active');}
+
+function showTriggerOpts(val){
+  ['SCHEDULED','SENSOR'].forEach(v=>{
+    const el=document.getElementById('triggerOpts-'+v);
+    if(el)el.classList.toggle('hidden',v!==val);
+  });
+  document.querySelectorAll('.trigger-opt').forEach(o=>{
+    const isActive=o.dataset.val===val;
+    o.style.borderColor=isActive?'#7c3aed':'#334155';
+    o.style.background=isActive?'#7c3aed22':'#0f172a';
+  });
+}
+document.querySelectorAll('input[name=trigger]').forEach(r=>r.addEventListener('change',()=>showTriggerOpts(r.value)));
+
+const SENSOR_OPTS=`<option>Sensor CO₂ — Reuniões A</option><option>Sensor CO₂ — Open Space P1</option><option>Sensor CO₂ — Open Space P2</option><option>Sensor Presença — Piso 1</option><option>Sensor Presença — Piso 2</option><option>Sensor Presença — Piso 3</option><option>Sensor Temperatura — AVAC Geral</option><option>Sensor Luminosidade — Fachada</option><option>Sensor Humidade — Open Space</option><option>SCI — Detetor Fumo</option><option>SCI — Botão Emergência</option><option>Hora do dia</option><option>Dia da semana</option>`;
+const DEVICE_OPTS=`<optgroup label="💡 Iluminação"><option>💡 Iluminação — Receção P0</option><option>💡 Iluminação — Open Space P1</option><option>💡 Iluminação — Open Space P2</option><option>💡 Iluminação — Open Space P3</option><option>💡 Iluminação — Sala Reuniões A</option><option>💡 Iluminação — Sala Reuniões B</option><option>💡 Iluminação — Cafetaria</option><option>💡 Iluminação — Fachada</option><option>💡 Iluminação — Parking</option><option>💡 Iluminação — Todos os pisos</option></optgroup><optgroup label="🌡️ AVAC"><option>🌡️ AVAC — Open Space P1</option><option>🌡️ AVAC — Open Space P2</option><option>🌡️ AVAC — Open Space P3</option><option>🌡️ AVAC — Sala Reuniões A</option><option>🌡️ AVAC — Sala Reuniões B</option><option>🌡️ AVAC — Cafetaria</option><option>🌡️ AVAC — Data Center</option><option>🌡️ Ventilação — Renovação Ar</option><option>🌡️ AVAC — Todos</option></optgroup><optgroup label="🔐 Segurança"><option>🔐 Alarme — Armar</option><option>🔐 Alarme — Desarmar</option><option>🔐 Câmeras — Modo Noturno</option><option>🔐 Controlo Acessos — Bloquear</option><option>🔐 Controlo Acessos — Desbloquear</option></optgroup><optgroup label="🛗 Elevadores"><option>🛗 Elevadores — Chamar Piso 0</option><option>🛗 Elevadores — Bloquear</option></optgroup><optgroup label="☀️ Energia"><option>☀️ Fotovoltaico — Prioridade Consumo</option><option>⚡ Equipamentos — Modo Eco</option></optgroup><optgroup label="📢 Comunicação"><option>📢 Difusão Áudio — Protocolo Evacuação</option><option>⚠️ Alerta — Enviar Notificação</option></optgroup>`;
+
+function addCondition(){
+  const c=document.getElementById('conditionsList');
+  const div=document.createElement('div');div.className='condition-row';
+  div.innerHTML=`<select class="flex-1" style="min-width:0">${SENSOR_OPTS}</select><select style="width:110px"><option>maior que</option><option>menor que</option><option>igual a</option><option>ativado</option><option>inativo &gt; X min</option></select><input type="number" placeholder="valor" style="width:70px;text-align:center"/><button onclick="this.closest('.condition-row').remove()" class="text-slate-500 hover:text-red-400 px-2 flex-shrink-0">✕</button>`;
+  c.appendChild(div);
+}
+
+function addAction(){
+  const c=document.getElementById('actionsList');
+  const div=document.createElement('div');div.className='action-row';
+  div.innerHTML=`<select class="flex-1" style="min-width:0">${DEVICE_OPTS}</select><select style="width:130px"><option>Ligar</option><option>Desligar</option><option>Dimmer 30%</option><option>Dimmer 50%</option><option>Dimmer 70%</option><option>Dimmer 100%</option><option>Máximo</option><option>Standby</option><option>Definir temp.</option><option>Ativar</option></select><input type="number" placeholder="--" style="width:60px;text-align:center"/><button onclick="this.closest('.action-row').remove()" class="text-slate-500 hover:text-red-400 px-2 flex-shrink-0">✕</button>`;
+  c.appendChild(div);
+}
+
+function saveNewScenario(){
+  const name=document.getElementById('scen-name').value||'Novo Cenário';
+  const icon=document.getElementById('scenIconPick').textContent;
+  const desc=document.getElementById('scen-desc').value||'Cenário personalizado';
+  const trigger=document.querySelector('input[name=trigger]:checked')?.value||'MANUAL';
+  scenarios.push({id:Date.now(),icon,name,desc,trigger,active:false,lastRun:'Nunca',conditions:[],actions:[]});
+  showToast(`✓ Cenário "${name}" criado!`);
+  switchScenarioTab('list');
+}
+
+function editScenario(id){switchScenarioTab('builder');}
+function activateScenario(name,btn){const o=btn.textContent;btn.textContent='⏳ A ativar...';btn.disabled=true;setTimeout(()=>{btn.textContent='✓ Ativado';btn.style.background='#065f46';addVoiceLog('BMS','Cenário "'+name+'" ativado com sucesso ✓','bms');showToast('Cenário "'+name+'" ativado');setTimeout(()=>{btn.textContent=o;btn.disabled=false;btn.style.background='';},2500);},1200);}
+
+// ============================================================
+// VOICE ASSISTANT
+// ============================================================
+let recognition=null;
+let voicePageListening=false;
+
+function buildRecognition(){
+  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SpeechRecognition)return null;
+  const r=new SpeechRecognition();
+  r.lang='pt-PT';r.continuous=false;r.interimResults=false;
+  r.onresult=e=>{const t=e.results[0][0].transcript;processVoiceCommand(t);};
+  r.onend=()=>stopListeningUI();
+  r.onerror=()=>stopListeningUI();
+  return r;
+}
+
+function toggleVoicePanel(){
+  S.voicePanelOpen=!S.voicePanelOpen;
+  document.getElementById('voicePanel').classList.toggle('open',S.voicePanelOpen);
+}
+
+function startListening(){
+  if(S.voiceListening){stopListeningUI();return;}
+  recognition=buildRecognition();
+  if(recognition){
+    S.voiceListening=true;
+    recognition.start();
+    setListeningUI(true);
+    addVoiceLog('BMS','🎤 A ouvir... Fale agora','bms');
+  } else {
+    addVoiceLog('BMS','⚠️ Microfone não disponível neste navegador. Use o campo de texto.','bms');
+  }
+}
+
+function stopListeningUI(){
+  S.voiceListening=false;
+  setListeningUI(false);
+}
+
+function setListeningUI(on){
+  const btn=document.getElementById('voiceFloatBtn');
+  const dot=document.getElementById('vpStatusDot');
+  const wave=document.getElementById('vpWave');
+  if(btn)btn.classList.toggle('listening',on);
+  if(dot)dot.style.background=on?'#4ade80':'#334155';
+  if(wave){wave.querySelectorAll('.voice-bar').forEach(b=>b.classList.toggle('active',on));if(on)wave.querySelectorAll('.voice-bar').forEach(b=>b.style.background='#4ade80');}
+  // page voice icon
+  const pageWave=document.getElementById('voicePageWave');
+  const pageBtn=document.getElementById('voicePageBtn');
+  const pageStatus=document.getElementById('voiceStatus');
+  if(pageWave){pageWave.querySelectorAll('.voice-bar').forEach(b=>{b.classList.toggle('active',on);b.style.background=on?'#4ade80':'#4c1d95';});}
+  if(pageBtn){pageBtn.textContent=on?'⏹ Parar Escuta':'🎤 Iniciar Escuta';pageBtn.style.background=on?'linear-gradient(135deg,#dc2626,#ea580c)':'linear-gradient(135deg,#2563eb,#7c3aed)';}
+  if(pageStatus)pageStatus.textContent=on?'🟢 A escutar...':'Clique para começar';
+}
+
+function toggleVoicePage(){
+  if(voicePageListening){
+    voicePageListening=false;
+    if(recognition)recognition.stop();
+    stopListeningUI();
+  } else {
+    voicePageListening=true;
+    startListening();
+  }
+}
+
+function sendVoiceText(){
+  const inputs=[document.getElementById('vpTextInput'),document.getElementById('voiceTextInput')];
+  const val=inputs.map(i=>i&&i.value.trim()).find(v=>v);
+  if(!val)return;
+  inputs.forEach(i=>{if(i)i.value='';});
+  processVoiceCommand(val);
+}
+
+function sendVoiceCommand(cmd){processVoiceCommand(cmd);}
+
+function addVoiceLog(who, msg, type){
+  const logs=[document.getElementById('vpLog'),document.getElementById('voiceLogPage')];
+  logs.forEach(log=>{
+    if(!log)return;
+    const empty=log.querySelector('.text-slate-500');
+    if(empty)empty.remove();
+    const div=document.createElement('div');
+    div.className='voice-transcript flex gap-2 items-start '+(type==='user'?'voice-user':'voice-bms');
+    div.style.cssText=type==='user'?'background:#1d4ed833;color:#93c5fd;padding:8px 12px;border-radius:10px 10px 2px 10px':'background:#05471433;color:#86efac;padding:8px 12px;border-radius:10px 10px 10px 2px';
+    div.innerHTML=`<span style="font-size:11px;opacity:.6;white-space:nowrap;margin-top:2px">${type==='user'?'Você':'BMS'}</span><span style="flex:1">${msg}</span>`;
+    log.appendChild(div);
+    log.scrollTop=log.scrollHeight;
+  });
+}
+
+// -------- NLP COMMAND PROCESSOR --------
+function processVoiceCommand(cmd){
+  const c=cmd.toLowerCase().trim();
+  addVoiceLog('Você',cmd,'user');
+  setTimeout(()=>{
+    const resp=interpretCommand(c,cmd);
+    addVoiceLog('BMS',resp,'bms');
+    speak(resp);
+  },600);
+}
+
+function interpretCommand(c, orig){
+  // Ligar/desligar luzes
+  if((c.includes('liga')&&(c.includes('luz')||c.includes('luzes')||c.includes('ilumina')))||c.includes('acende')){
+    const floor=extractFloor(c);
+    if(floor!==null){
+      lightingZones.forEach((z,i)=>{if(z.zone.includes('Piso '+floor)){z.on=true;}});
+      if(S.currentPage==='lighting')renderLighting();
+      return `✓ Luzes do Piso ${floor} ligadas.`;
+    }
+    if(c.includes('tudo')||c.includes('todas')||c.includes('todos')){
+      lightingZones.forEach(z=>z.on=true);
+      if(S.currentPage==='lighting')renderLighting();
+      return '✓ Todas as luzes foram ligadas.';
+    }
+    return '✓ Luzes ligadas.';
+  }
+  if((c.includes('desliga')&&(c.includes('luz')||c.includes('luzes')||c.includes('ilumina')))||c.includes('apaga')){
+    const floor=extractFloor(c);
+    if(floor!==null){
+      lightingZones.forEach(z=>{if(z.zone.includes('Piso '+floor))z.on=false;});
+      if(S.currentPage==='lighting')renderLighting();
+      return `✓ Luzes do Piso ${floor} desligadas.`;
+    }
+    if(c.includes('tudo')||c.includes('todas')){
+      lightingZones.forEach(z=>z.on=false);
+      if(S.currentPage==='lighting')renderLighting();
+      return '✓ Todas as luzes foram desligadas.';
+    }
+    return '✓ Luzes desligadas.';
+  }
+  // AVAC temperatura
+  if(c.includes('avac')||c.includes('temperatura')||c.includes('grau')||c.includes('frio')||c.includes('calor')){
+    const temp=extractNumber(c);
+    if(temp&&temp>=16&&temp<=30){
+      hvacZones.forEach(z=>z.set=temp);
+      if(S.currentPage==='hvac')renderHVAC();
+      return `✓ AVAC ajustado para ${temp}°C em todas as zonas.`;
+    }
+    const avg=(hvacZones.reduce((a,z)=>a+z.temp,0)/hvacZones.length).toFixed(1);
+    if(c.includes('qual')||c.includes('como')||c.includes('temperatura')){
+      return `🌡️ Temperatura média atual: ${avg}°C. Piso 1: ${hvacZones[0].temp}°C · Piso 2: ${hvacZones[1].temp}°C · Sala Reuniões: ${hvacZones[3].temp}°C`;
+    }
+    return `A temperatura média atual é ${avg}°C. Para ajustar, diga por exemplo "Põe o AVAC a 22 graus".`;
+  }
+  // Cenários
+  if(c.includes('modo')||c.includes('cenário')||c.includes('cenario')||c.includes('ativa')||c.includes('ligar cenário')){
+    if(c.includes('matinal')||c.includes('manhã')||c.includes('manha')||c.includes('acordar')||c.includes('começar dia')||c.includes('comecar dia')){
+      activateScenarioByName('Ativação Matinal');
+      return '🌅 Ativação Matinal iniciada — AVAC em pré-aquecimento a 18°C, iluminação de trabalho a 100%, alarme desarmado.';
+    }
+    if(c.includes('eco')||c.includes('poupança')||c.includes('poupar')||c.includes('economiz')||c.includes('fim de semana')||c.includes('feriado')){
+      activateScenarioByName('Modo Eco Energético');
+      return '🌿 Modo Eco Energético ativado — Zonas não ocupadas desligadas, AVAC em standby, fotovoltaico com prioridade.';
+    }
+    if((c.includes('energétic')||c.includes('energetic')||(c.includes('energia')&&c.includes('diária'))||(c.includes('energia')&&c.includes('auto')))&&!c.includes('eco')){
+      activateScenarioByName('Gestão Energética Diária');
+      return '⚡ Gestão Energética Diária ativada — Presença e CO₂ a controlar iluminação e ventilação automaticamente.';
+    }
+    if(c.includes('reunião')||c.includes('reuniao')||c.includes('meeting')||c.includes('sala')){
+      activateScenarioByName('Sala de Reunião Inteligente');
+      return '🤝 Sala de Reunião Inteligente ativada — Iluminação a 70%, AVAC a 21°C, gestão automática de ocupação.';
+    }
+    if(c.includes('final do dia')||c.includes('fim do dia')||c.includes('fechar o dia')||c.includes('encerrar')||(c.includes('final')&&c.includes('dia'))){
+      activateScenarioByName('Final do Dia');
+      return '🌆 Final do Dia ativado — Áreas de trabalho a dimmer 30%, fachada ligada; às 22h iluminação e AVAC desligam, alarme arma.';
+    }
+    if(c.includes('noite')||c.includes('noturna')||c.includes('noturno')){
+      activateScenarioByName('Gestão Noturna');
+      return '🌙 Gestão Noturna ativada — Luzes apenas em zonas com movimento, câmeras em modo noturno.';
+    }
+    if(c.includes('emergência')||c.includes('emergencia')||c.includes('evacuação')||c.includes('evacuacao')||c.includes('evacua')||c.includes('incêndio')||c.includes('incendio')){
+      activateScenarioByName('Evacuação de Emergência');
+      return '🚨 ALERTA: Evacuação de Emergência ativada — Iluminação máxima, elevadores ao piso 0, alarme geral, protocolo de evacuação ativado!';
+    }
+    if(c.includes('qualidade do ar')||(c.includes('ar')&&(c.includes('qualidade')||c.includes('co2')||c.includes('ventil')))||c.includes('co₂')||c.includes('humidade')){
+      activateScenarioByName('Qualidade do Ar');
+      return '🌬️ Qualidade do Ar ativado — Ventilação aumentada, renovação de ar ativa, monitorização de CO₂ e humidade.';
+    }
+    if(c.includes('evento')||c.includes('nave')||c.includes('espetáculo')||c.includes('espetaculo')||c.includes('conferência')||c.includes('conferencia')||c.includes('plateia')){
+      activateScenarioByName('Evento — Nave Principal');
+      return '🎭 Evento — Nave Principal ativado — Iluminação de espetáculo, AVAC reforçado, sistemas AV ligados, acessos em modo evento.';
+    }
+    // Fallback — listar cenários disponíveis
+    if(c.includes('cenário')||c.includes('cenario')){
+      showPage('scenarios',null);
+      return '⚡ Cenários disponíveis: Ativação Matinal, Gestão Energética Diária, Sala de Reunião Inteligente, Final do Dia, Gestão Noturna, Evacuação de Emergência, Modo Eco Energético, Qualidade do Ar. Qual pretende ativar?';
+    }
+  }
+  // Alertas
+  if(c.includes('alerta')||c.includes('problema')||c.includes('aviso')){
+    const active=alerts.filter(a=>!a.acked);
+    if(active.length===0)return '✓ Sem alertas ativos de momento. Tudo normal.';
+    return `⚠️ Existem ${active.length} alertas ativos: ${active.map(a=>`"${a.msg}"`).join('; ')}.`;
+  }
+  // Energia
+  if(c.includes('energia')||c.includes('consumo')||c.includes('elétric')||c.includes('electric')||c.includes('kwh')||c.includes('solar')){
+    return '⚡ Consumo atual: 284 kW. Hoje foram consumidos 284 kWh. Produção solar: 45 kW (68 kWh hoje). Poupança CO₂: 34 kg.';
+  }
+  // Elevadores
+  if(c.includes('elevador')){
+    const ok=elevators.filter(e=>e.status==='ok');
+    return `🛗 ${ok.length} de ${elevators.length} elevadores operacionais. Elevador 2 com falha de comunicação. Elevador S. Carga em manutenção.`;
+  }
+  // Dispositivos online
+  if(c.includes('dispositivo')||c.includes('sistema')||c.includes('estado')||c.includes('status')){
+    return '📊 27 de 30 dispositivos online. Todos os sistemas principais operacionais. 1 alerta crítico nos elevadores.';
+  }
+  // Solar
+  if(c.includes('fotovoltaico')||c.includes('painel')||c.includes('solar')){
+    return '☀️ Fotovoltaico: 45 kW de produção atual. 48/52 painéis ativos. Total hoje: 68 kWh. Poupança: 34 kg CO₂.';
+  }
+  // Navegar
+  if(c.includes('mostra')||c.includes('abre')||c.includes('vai para')||c.includes('navega')){
+    if(c.includes('dashboard')||c.includes('início')){showPage('dashboard',null);return '📊 A abrir o Dashboard.';}
+    if(c.includes('ilumina')||c.includes('luz')){showPage('lighting',null);return '💡 A abrir Iluminação.';}
+    if(c.includes('avac')||c.includes('clima')){showPage('hvac',null);return '🌡️ A abrir AVAC.';}
+    if(c.includes('solar')||c.includes('fotovolt')){showPage('solar',null);return '☀️ A abrir Fotovoltaico.';}
+    if(c.includes('alerta')){showPage('alerts',null);return '⚠️ A abrir Alertas.';}
+    if(c.includes('cenário')||c.includes('cenario')){showPage('scenarios',null);return '⚡ A abrir Cenários.';}
+  }
+  // Greetings
+  if(c.includes('olá')||c.includes('ola')||c.includes('bom dia')||c.includes('boa tarde')||c.includes('boa noite')){
+    const h=new Date().getHours();
+    const saud=h<12?'Bom dia':h<18?'Boa tarde':'Boa noite';
+    return `${h<12?'🌅 Bom dia':h<18?'☀️ Boa tarde':'🌙 Boa noite'}, Miguel! Edifício com ${alerts.filter(a=>!a.acked).length} alertas ativos. Como posso ajudar?`;
+  }
+  if(c.includes('obrigad')){return 'De nada! Estou sempre disponível para ajudar a gerir o edifício. 🏢';}
+  if(c.includes('ajuda')||c.includes('o que podes')||c.includes('comandos')){
+    return '💡 Posso: ligar/desligar luzes por piso, ajustar AVAC, ativar cenários (Ativação Matinal, Final do Dia, Modo Eco, Evacuação de Emergência…), verificar alertas, consultar energia e solar, e navegar entre páginas. Experimente: "Ativa a ativação matinal" ou "Qual a temperatura do piso 1?".';
+  }
+  return `Não percebi "${orig}". Experimente: "Liga as luzes do piso 1", "Ativa a gestão noturna", "Qual é o consumo de energia?", ou "Quantos alertas há?".`;
+}
+
+function extractFloor(c){
+  const m=c.match(/piso\s*(\d)/)||c.match(/(\d)[ºo]\s*piso/)||c.match(/piso\s*(zero|um|dois|três|quatro)/i);
+  if(!m)return null;
+  const map={'zero':0,'um':1,'dois':2,'três':3,'quatro':4};
+  return isNaN(m[1])?map[m[1].toLowerCase()]??null:parseInt(m[1]);
+}
+function extractNumber(c){const m=c.match(/(\d+)/);return m?parseInt(m[1]):null;}
+
+function activateScenarioByName(name){
+  const s=scenarios.find(x=>x.name===name);
+  if(s){s.active=true;if(S.currentPage==='scenarios')renderScenarios();}
+  showToast(`Cenário "${name}" ativado`);
+}
+
+function speak(text){
+  if(!window.speechSynthesis)return;
+  const clean=text.replace(/[✓⚠️🌡️💡🌿🌙🛗☀️⚡📊🔐🤝🚨]/g,'');
+  const u=new SpeechSynthesisUtterance(clean);
+  u.lang='pt-PT';u.rate=1;u.pitch=1;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+}
+
+function clearVoiceLog(){
+  ['vpLog','voiceLogPage'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML='<div class="text-xs text-slate-500 text-center py-4">Histórico limpo.</div>';});
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+function initEnergyChart(){
+  const ctx=document.getElementById('energyChart').getContext('2d');
+  const hrs=Array.from({length:24},(_,i)=>i+'h');
+  const c=[12,10,9,9,10,14,32,58,72,78,82,85,80,76,79,84,88,82,70,58,42,30,18,14];
+  const s=[0,0,0,0,0,0,2,8,18,28,36,42,44,43,40,35,28,18,8,2,0,0,0,0];
+  S.charts.energy=new Chart(ctx,{type:'line',data:{labels:hrs,datasets:[{label:'Consumo kWh',data:c,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.15)',fill:true,tension:.4,pointRadius:0},{label:'Solar kWh',data:s,borderColor:'#fbbf24',backgroundColor:'rgba(251,191,36,.1)',fill:true,tension:.4,pointRadius:0}]},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{x:{ticks:{color:'#475569',maxTicksLimit:8}},y:{ticks:{color:'#475569'}}}}});
+}
+function initSolarChart(){
+  if(S.charts.solar)return;
+  const ctx=document.getElementById('solarChart').getContext('2d');
+  const hrs=Array.from({length:24},(_,i)=>i+'h');
+  const p=[0,0,0,0,0,0,1,5,15,26,34,41,45,44,40,33,25,15,6,1,0,0,0,0];
+  S.charts.solar=new Chart(ctx,{type:'line',data:{labels:hrs,datasets:[{label:'Produção kW',data:p,borderColor:'#fbbf24',backgroundColor:'rgba(251,191,36,.2)',fill:true,tension:.4,pointRadius:0}]},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8'}}},scales:{x:{ticks:{color:'#475569',maxTicksLimit:8}},y:{ticks:{color:'#475569'}}}}});
+}
+function initWaterChart(){
+  if(S.charts.water)return;
+  const ctx=document.getElementById('waterChart').getContext('2d');
+  S.charts.water=new Chart(ctx,{type:'bar',data:{labels:['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'],datasets:[{label:'Consumo m³',data:[2.8,3.1,2.9,3.4,2.4,0.8,0.5],backgroundColor:'rgba(56,189,248,.6)',borderColor:'#38bdf8',borderWidth:1}]},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8'}}},scales:{x:{ticks:{color:'#475569'}},y:{ticks:{color:'#475569'}}}}});
+}
+function initReportChart(){
+  if(S.charts.report)return;
+  const ctx=document.getElementById('reportChart').getContext('2d');
+  S.charts.report=new Chart(ctx,{type:'bar',data:{labels:['Jan','Fev','Mar','Abr','Mai'],datasets:[{label:'AVAC',data:[1820,1650,1400,1200,980],backgroundColor:'rgba(96,165,250,.7)'},{label:'Iluminação',data:[420,410,390,380,360],backgroundColor:'rgba(251,191,36,.7)'},{label:'Elevadores',data:[180,175,170,165,160],backgroundColor:'rgba(167,139,250,.7)'},{label:'Outros',data:[280,260,250,240,230],backgroundColor:'rgba(148,163,184,.4)'}]},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{x:{stacked:true,ticks:{color:'#475569'}},y:{stacked:true,ticks:{color:'#475569'}}}}});
+}
+
+// ============================================================
+// CLOCK + SIMULATOR + TOAST
+// ============================================================
+function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleString('pt-PT',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+function simulate(){const h=new Date().getHours();const base=[0,0,0,0,0,0,1,5,15,26,34,41,45,44,40,33,25,15,6,1,0,0,0,0][h];document.getElementById('solarNow').textContent=Math.max(0,Math.round(base+(Math.random()-.5)*4))+' kW';hvacZones.forEach(z=>{if(z.on)z.temp=Math.round((z.temp+(Math.random()-.5)*.2)*10)/10;});}
+function showToast(msg){const t=document.createElement('div');t.className='fixed bottom-6 right-24 px-4 py-3 rounded-xl text-white text-sm font-semibold z-50';t.style.cssText='background:#065f46;border:1px solid #166534;box-shadow:0 4px 24px rgba(0,0,0,.5);animation:slideIn .2s ease';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
+
+// ============================================================
+// INIT
+// ============================================================
+function initApp(){
+  renderSystemsGrid();renderAlertsList();renderFloorMap();
+  renderLighting();renderHVAC();renderElevators();
+  renderElectrical();renderFire();renderSecurity();
+  renderScenarios();renderAlertsFull();renderUsers();renderUptime();
+  initEnergyChart();
+  updateClock();setInterval(updateClock,1000);setInterval(simulate,5000);
+  // Auto-greet in voice log after 1s
+  setTimeout(()=>{
+    if(!document.getElementById('vpLog').querySelector('.voice-bms')){
+      addVoiceLog('BMS','👋 Olá Miguel! Edifício operacional. 3 alertas ativos. Diga um comando.','bms');
+    }
+  },1000);
+}
+
+document.getElementById('loginPage').classList.add('active');
+</script>
+</body>
+</html>
