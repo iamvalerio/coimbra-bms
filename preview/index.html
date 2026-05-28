@@ -3,25 +3,25 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Coimbra Editora BMS</title>
+<title>SALAZAR | CBR Editora - AI BMS</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
-<script>tailwind.config={darkMode:'class',theme:{extend:{colors:{surface:'#1e293b',background:'#0f172a'}}}}</script>
+<script>tailwind.config={darkMode:'class',theme:{extend:{colors:{surface:'#1e293b',background:'#0f172a','ghost':'#00C896','ghost-dark':'#00A07A','ghost-light':'#00E8B0'}}}}</script>
 <style>
 body{background:#0f172a;color:#f1f5f9;font-family:'Segoe UI',system-ui,sans-serif;}
 .sidebar{width:260px;min-width:260px;}
 @media(max-width:768px){.sidebar{position:fixed;z-index:50;transform:translateX(-100%);transition:.3s;}.sidebar.open{transform:translateX(0);}}
 .nav-item{display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:8px;cursor:pointer;transition:.15s;font-size:14px;color:#94a3b8;}
 .nav-item:hover{background:#1e293b;color:#f1f5f9;}
-.nav-item.active{background:#1d4ed8;color:#fff;font-weight:600;}
+.nav-item.active{background:#00A07A;color:#fff;font-weight:600;}
 .nav-section{font-size:10px;font-weight:700;letter-spacing:.1em;color:#475569;padding:16px 14px 4px;}
 .card{background:#1e293b;border-radius:12px;padding:20px;border:1px solid #334155;}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;}
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
 .slider{-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:#334155;outline:none;}
-.slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#3b82f6;cursor:pointer;}
+.slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#34D399;cursor:pointer;}
 .toggle{position:relative;width:44px;height:24px;background:#334155;border-radius:12px;cursor:pointer;transition:.2s;}
-.toggle.on{background:#3b82f6;}
+.toggle.on{background:#34D399;}
 .toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s;}
 .toggle.on::after{left:23px;}
 ::-webkit-scrollbar{width:6px;}
@@ -32,10 +32,10 @@ body{background:#0f172a;color:#f1f5f9;font-family:'Segoe UI',system-ui,sans-seri
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;}
 .modal.open{display:flex;}
 input,select,textarea{background:#0f172a;border:1px solid #334155;color:#f1f5f9;border-radius:8px;padding:8px 12px;width:100%;outline:none;font-size:14px;}
-input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
+input:focus,select:focus,textarea:focus{border-color:#34D399;}
 .btn{padding:8px 18px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;border:none;}
-.btn-primary{background:#2563eb;color:#fff;}
-.btn-primary:hover{background:#1d4ed8;}
+.btn-primary{background:#00C896;color:#fff;}
+.btn-primary:hover{background:#00A07A;}
 .btn-ghost{background:transparent;color:#94a3b8;border:1px solid #334155;}
 .btn-ghost:hover{background:#1e293b;color:#f1f5f9;}
 .btn-danger{background:#dc2626;color:#fff;}
@@ -48,14 +48,14 @@ input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
 .app-shell.active{display:flex;}
 
 /* Voice Assistant */
-.voice-btn{position:fixed;bottom:28px;right:28px;z-index:200;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(37,99,235,.5);transition:.2s;}
+.voice-btn{position:fixed;bottom:28px;right:28px;z-index:200;width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#00C896,#00A07A);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 24px rgba(0,200,150,.5);transition:.2s;}
 .voice-btn:hover{transform:scale(1.08);}
 .voice-btn.listening{animation:voicePulse 1.2s ease-in-out infinite;background:linear-gradient(135deg,#dc2626,#ea580c);}
 @keyframes voicePulse{0%,100%{box-shadow:0 4px 24px rgba(220,38,38,.5),0 0 0 0 rgba(220,38,38,.4)}50%{box-shadow:0 4px 24px rgba(220,38,38,.5),0 0 0 18px rgba(220,38,38,0)}}
 .voice-panel{position:fixed;bottom:100px;right:28px;z-index:199;width:340px;background:#1e293b;border:1px solid #334155;border-radius:16px;overflow:hidden;transform:translateY(20px);opacity:0;pointer-events:none;transition:.25s;box-shadow:0 8px 40px rgba(0,0,0,.5);}
 .voice-panel.open{transform:translateY(0);opacity:1;pointer-events:all;}
 .voice-wave{display:flex;align-items:center;justify-content:center;gap:3px;height:32px;}
-.voice-bar{width:3px;border-radius:2px;background:#3b82f6;transition:.1s;}
+.voice-bar{width:3px;border-radius:2px;background:#34D399;transition:.1s;}
 .voice-bar.active{animation:waveAnim .6s ease-in-out infinite;}
 .voice-bar:nth-child(1){animation-delay:0s;}
 .voice-bar:nth-child(2){animation-delay:.1s;}
@@ -67,14 +67,14 @@ input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
 .voice-log::-webkit-scrollbar{width:4px;}
 .voice-log::-webkit-scrollbar-thumb{background:#334155;}
 .voice-transcript{padding:6px 10px;border-radius:8px;font-size:13px;margin-bottom:6px;}
-.voice-user{background:#1d4ed833;color:#93c5fd;align-self:flex-end;}
+.voice-user{background:#00A07A33;color:#A7F3D0;align-self:flex-end;}
 .voice-bms{background:#05471433;color:#86efac;}
 
 /* Scenario Builder */
 .condition-row,.action-row{display:flex;gap:8px;align-items:center;padding:10px;background:#0f172a;border-radius:8px;border:1px solid #334155;margin-bottom:8px;}
 .scenario-card{background:#1e293b;border:1px solid #334155;border-radius:12px;overflow:hidden;transition:.2s;}
-.scenario-card:hover{border-color:#3b82f6;}
-.scenario-card.active-scenario{border-color:#2563eb;box-shadow:0 0 0 1px #2563eb33;}
+.scenario-card:hover{border-color:#34D399;}
+.scenario-card.active-scenario{border-color:#00C896;box-shadow:0 0 0 1px #00C89633;}
 .trigger-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
 .step-circle{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
 </style>
@@ -84,20 +84,23 @@ input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
 <!-- LOGIN PAGE -->
 <div id="loginPage" class="login-page min-h-screen items-center justify-center" style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%)">
   <div class="flex w-full max-w-4xl shadow-2xl rounded-2xl overflow-hidden" style="min-height:520px">
-    <div class="flex-1 flex flex-col justify-between p-12" style="background:linear-gradient(135deg,#1d4ed8,#0f172a)">
+    <div class="flex-1 flex flex-col justify-between p-12" style="background:linear-gradient(135deg,#003d2e,#0f172a)">
       <div>
         <div class="flex items-center gap-3 mb-8">
           <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="rgba(255,255,255,0.15)"/><path d="M8 32V16l12-8 12 8v16H24v-8h-8v8H8z" fill="white"/></svg>
-          <span class="text-xl font-bold text-white">Coimbra BMS</span>
+          <div>
+            <div class="text-lg font-black text-white tracking-wide">SALAZAR</div>
+            <div class="text-xs font-semibold tracking-widest" style="color:#00C896">CBR EDITORA</div>
+          </div>
         </div>
-        <h1 class="text-3xl font-bold text-white mb-3">Building Management System</h1>
-        <p class="text-blue-200 text-sm">Gestão inteligente do Edifício Coimbra Editora</p>
+        <h1 class="text-3xl font-bold text-white mb-3">SALAZAR | CBR Editora</h1>
+        <p class="text-green-200 text-sm font-semibold tracking-wide">AI Building Management System</p>
       </div>
       <div class="space-y-3">
-        <div class="flex items-center gap-3 text-blue-200 text-sm"><span>💡</span> Iluminação, AVAC, Fotovoltaico</div>
-        <div class="flex items-center gap-3 text-blue-200 text-sm"><span>🔐</span> Segurança e Controlo de Acessos</div>
-        <div class="flex items-center gap-3 text-blue-200 text-sm"><span>🎤</span> Controlo por voz em português</div>
-        <div class="flex items-center gap-3 text-blue-200 text-sm"><span>⚡</span> Cenários de automação avançados</div>
+        <div class="flex items-center gap-3 text-green-200 text-sm"><span>💡</span> Iluminação, AVAC, Fotovoltaico</div>
+        <div class="flex items-center gap-3 text-green-200 text-sm"><span>🔐</span> Segurança e Controlo de Acessos</div>
+        <div class="flex items-center gap-3 text-green-200 text-sm"><span>🎤</span> Controlo por voz em português</div>
+        <div class="flex items-center gap-3 text-green-200 text-sm"><span>⚡</span> Cenários de automação avançados</div>
       </div>
     </div>
     <div class="flex-1 flex flex-col justify-center p-12" style="background:#1e293b">
@@ -122,8 +125,8 @@ input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
   <!-- SIDEBAR -->
   <div id="sidebar" class="sidebar h-full flex flex-col" style="background:#0d1b2e;border-right:1px solid #1e293b">
     <div class="p-4 flex items-center gap-3" style="border-bottom:1px solid #1e293b">
-      <svg width="32" height="32" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="8" fill="#2563eb"/><path d="M8 32V16l12-8 12 8v16H24v-8h-8v8H8z" fill="white"/></svg>
-      <div><div class="font-bold text-white text-sm">Coimbra BMS</div><div class="text-xs text-slate-500">v1.0.0</div></div>
+      <svg width="32" height="32" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="8" fill="#00C896"/><path d="M8 32V16l12-8 12 8v16H24v-8h-8v8H8z" fill="white"/></svg>
+      <div><div class="font-black text-white text-sm tracking-wide">SALAZAR <span style="color:#00C896">|</span> CBR</div><div class="text-xs text-slate-500">AI BMS v1.0.0</div></div>
     </div>
     <div class="flex-1 overflow-y-auto p-2">
       <div class="nav-section">GERAL</div>
@@ -160,7 +163,7 @@ input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
     </div>
     <div class="p-3" style="border-top:1px solid #1e293b">
       <div class="flex items-center gap-3 p-2 rounded-lg" style="background:#1e293b">
-        <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style="background:#2563eb">MV</div>
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style="background:#00C896">MV</div>
         <div class="flex-1 min-w-0"><div class="text-sm font-semibold text-white truncate">Miguel Valerio</div><div class="text-xs text-slate-400">ADMIN</div></div>
         <button onclick="doLogout()" class="text-slate-400 hover:text-white" title="Logout">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -175,7 +178,7 @@ input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
       <button class="md:hidden text-slate-400" onclick="document.getElementById('sidebar').classList.toggle('open')">
         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
-      <div><h1 id="pageTitle" class="font-bold text-white text-lg">Dashboard</h1><div class="text-xs text-slate-400">Edifício Coimbra Editora · Piso 1–5</div></div>
+      <div><h1 id="pageTitle" class="font-bold text-white text-lg">Dashboard</h1><div class="text-xs text-slate-400">SALAZAR | CBR Editora · Piso 1–5</div></div>
       <div class="flex items-center gap-4">
         <div id="clock" class="text-sm text-slate-400 hidden md:block"></div>
         <button onclick="showPage('alerts',null)" class="relative p-2 rounded-lg text-slate-400 hover:text-white" style="background:#1e293b">
@@ -183,11 +186,11 @@ input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
           <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full text-xs flex items-center justify-center font-bold" style="background:#dc2626;color:white">3</span>
         </button>
         <!-- Voice quick button in topbar -->
-        <button onclick="toggleVoicePanel()" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold" style="background:linear-gradient(135deg,#2563eb22,#7c3aed22);border:1px solid #3b82f655;color:#93c5fd">
+        <button onclick="toggleVoicePanel()" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold" style="background:linear-gradient(135deg,#00C89622,#7c3aed22);border:1px solid #34D39955;color:#A7F3D0">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg>
           Voz
         </button>
-        <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style="background:#2563eb">MV</div>
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style="background:#00C896">MV</div>
       </div>
     </div>
 
@@ -210,7 +213,7 @@ input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="card">
-            <div class="flex items-center justify-between mb-4"><div class="text-sm font-semibold text-white">Alertas Recentes</div><button onclick="showPage('alerts',null)" class="text-xs text-blue-400">Ver todos →</button></div>
+            <div class="flex items-center justify-between mb-4"><div class="text-sm font-semibold text-white">Alertas Recentes</div><button onclick="showPage('alerts',null)" class="text-xs text-emerald-400">Ver todos →</button></div>
             <div id="alertsList" class="space-y-2"></div>
           </div>
           <div class="card"><div class="text-sm font-semibold text-white mb-4">Mapa do Edifício</div><div id="floorMap" class="space-y-2"></div></div>
@@ -223,7 +226,7 @@ input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
           <!-- Hero -->
           <div class="card mb-6 text-center" style="background:linear-gradient(135deg,#1e1b4b,#1e293b);border-color:#4c1d95">
             <div class="mb-4">
-              <div id="voicePageIcon" class="inline-flex items-center justify-center w-20 h-20 rounded-full mx-auto mb-4" style="background:linear-gradient(135deg,#2563eb,#7c3aed);box-shadow:0 0 40px rgba(124,58,237,.3)">
+              <div id="voicePageIcon" class="inline-flex items-center justify-center w-20 h-20 rounded-full mx-auto mb-4" style="background:linear-gradient(135deg,#00C896,#00A07A);box-shadow:0 0 40px rgba(124,58,237,.3)">
                 <svg width="36" height="36" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
               </div>
               <h2 class="text-xl font-bold text-white mb-1">Assistente de Voz BMS</h2>
@@ -239,7 +242,7 @@ input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
               <div class="voice-bar" style="height:6px;background:#4c1d95"></div>
               <div class="voice-bar" style="height:6px;background:#4c1d95"></div>
             </div>
-            <button id="voicePageBtn" onclick="toggleVoicePage()" class="btn btn-primary px-8 py-3 text-base" style="background:linear-gradient(135deg,#2563eb,#7c3aed)">
+            <button id="voicePageBtn" onclick="toggleVoicePage()" class="btn btn-primary px-8 py-3 text-base" style="background:linear-gradient(135deg,#00C896,#00A07A)">
               🎤 Iniciar Escuta
             </button>
             <div id="voiceStatus" class="mt-3 text-sm text-slate-400">Clique para começar</div>
@@ -288,7 +291,7 @@ input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
       <div id="page-scenarios" class="page animate-in">
         <!-- Tabs -->
         <div class="flex gap-1 mb-6 p-1 rounded-xl" style="background:#1e293b;width:fit-content">
-          <button id="tab-list" onclick="switchScenarioTab('list')" class="px-4 py-2 rounded-lg text-sm font-semibold transition" style="background:#2563eb;color:white">📋 Cenários</button>
+          <button id="tab-list" onclick="switchScenarioTab('list')" class="px-4 py-2 rounded-lg text-sm font-semibold transition" style="background:#00C896;color:white">📋 Cenários</button>
           <button id="tab-builder" onclick="switchScenarioTab('builder')" class="px-4 py-2 rounded-lg text-sm font-semibold transition text-slate-400 hover:text-white">⚡ Criar Cenário</button>
           <button id="tab-schedules" onclick="switchScenarioTab('schedules')" class="px-4 py-2 rounded-lg text-sm font-semibold transition text-slate-400 hover:text-white">🕐 Agendamentos</button>
         </div>
@@ -306,7 +309,7 @@ input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
             <!-- Step 1: Basic info -->
             <div class="mb-6">
               <div class="flex items-center gap-3 mb-4">
-                <div class="step-circle" style="background:#2563eb;color:white">1</div>
+                <div class="step-circle" style="background:#00C896;color:white">1</div>
                 <span class="font-semibold text-white">Informação básica</span>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 ml-10">
@@ -390,7 +393,7 @@ input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
                 <span class="font-semibold text-white">Condições <span class="text-slate-400 font-normal text-sm">(opcional)</span></span>
               </div>
               <div id="conditionsList" class="ml-10 space-y-2"></div>
-              <button onclick="addCondition()" class="ml-10 mt-2 text-xs text-blue-400 hover:text-blue-300">+ Adicionar condição</button>
+              <button onclick="addCondition()" class="ml-10 mt-2 text-xs text-emerald-400 hover:text-emerald-300">+ Adicionar condição</button>
             </div>
 
             <!-- Step 4: Actions -->
@@ -414,7 +417,7 @@ input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
                   <button onclick="this.closest('.action-row').remove()" class="text-slate-500 hover:text-red-400 px-2">✕</button>
                 </div>
               </div>
-              <button onclick="addAction()" class="ml-10 mt-2 text-xs text-blue-400 hover:text-blue-300">+ Adicionar ação</button>
+              <button onclick="addAction()" class="ml-10 mt-2 text-xs text-emerald-400 hover:text-emerald-300">+ Adicionar ação</button>
             </div>
 
             <div class="flex gap-3 pt-4" style="border-top:1px solid #334155">
@@ -485,7 +488,7 @@ input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
           <div class="card"><div class="text-sm font-semibold text-white mb-2">Consumo — semana</div><canvas id="waterChart" height="200"></canvas></div>
           <div class="grid grid-cols-2 gap-4 content-start">
             <div class="card"><div class="text-xs text-slate-400">CONSUMO HOJE</div><div class="text-2xl font-bold text-white mt-1">2.4 m³</div></div>
-            <div class="card"><div class="text-xs text-slate-400">PRESSÃO REDE</div><div class="text-2xl font-bold mt-1" style="color:#60a5fa">3.2 bar</div></div>
+            <div class="card"><div class="text-xs text-slate-400">PRESSÃO REDE</div><div class="text-2xl font-bold mt-1" style="color:#6EE7B7">3.2 bar</div></div>
             <div class="card"><div class="text-xs text-slate-400">BOMBAS ATIVAS</div><div class="text-2xl font-bold mt-1" style="color:#4ade80">2/3</div></div>
             <div class="card"><div class="text-xs text-slate-400">TEMP. AQS</div><div class="text-2xl font-bold mt-1" style="color:#fbbf24">58°C</div></div>
           </div>
@@ -569,7 +572,7 @@ input:focus,select:focus,textarea:focus{border-color:#3b82f6;}
 
 <style>
 .day-pill{padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #334155;color:#f1f5f9;background:#1e293b;user-select:none;}
-.day-pill.active{background:#2563eb;border-color:#2563eb;color:white;}
+.day-pill.active{background:#00C896;border-color:#00C896;color:white;}
 </style>
 
 <script>
@@ -691,7 +694,7 @@ const schedules=[
 // ============================================================
 // HELPERS
 // ============================================================
-const sevColor={CRITICAL:'#f87171',WARNING:'#fbbf24',INFO:'#60a5fa',EMERGENCY:'#f43f5e'};
+const sevColor={CRITICAL:'#f87171',WARNING:'#fbbf24',INFO:'#6EE7B7',EMERGENCY:'#f43f5e'};
 const sevBg={CRITICAL:'#450a0a',WARNING:'#451a03',INFO:'#0c1a2e',EMERGENCY:'#4c0519'};
 const roleBadgeColor={ADMIN:'#7c3aed',MANAGER:'#0e7490',OPERATOR:'#065f46',VIEWER:'#374151',MAINTENANCE:'#78350f'};
 const triggerLabel={MANUAL:'Manual',SCHEDULED:'Agendado',SENSOR:'Sensor'};
@@ -784,11 +787,11 @@ function renderHVAC(){
         <div class="toggle ${z.on?'on':''}" onclick="this.classList.toggle('on')"></div>
       </div>
       <div class="flex items-end gap-3 mb-3">
-        <div><div class="text-xs text-slate-400">ATUAL</div><div class="text-3xl font-bold" style="color:${z.temp>23?'#f87171':'#60a5fa'}">${z.temp}°</div></div>
+        <div><div class="text-xs text-slate-400">ATUAL</div><div class="text-3xl font-bold" style="color:${z.temp>23?'#f87171':'#6EE7B7'}">${z.temp}°</div></div>
         <div class="flex-1"><div class="text-xs text-slate-400 mb-1" id="hset-${i}">SETPOINT: ${z.set}°C</div><input type="range" class="slider w-full" min="16" max="30" value="${z.set}" oninput="document.getElementById('hset-${i}').textContent='SETPOINT: '+this.value+'°C'"/></div>
       </div>
       <div class="flex gap-2">
-        ${['cooling','heating','fan','off'].map(m=>`<button class="flex-1 text-xs py-1 rounded ${z.mode===m?'':'opacity-40'}" style="background:${z.mode===m?'#1d4ed8':'#334155'};color:white">${{cooling:'❄️',heating:'🔥',fan:'💨',off:'⏹'}[m]}</button>`).join('')}
+        ${['cooling','heating','fan','off'].map(m=>`<button class="flex-1 text-xs py-1 rounded ${z.mode===m?'':'opacity-40'}" style="background:${z.mode===m?'#00A07A':'#334155'};color:white">${{cooling:'❄️',heating:'🔥',fan:'💨',off:'⏹'}[m]}</button>`).join('')}
       </div>
     </div>`).join('');
 }
@@ -893,12 +896,12 @@ function filterAlerts(f){S.alertFilter=f;['ALL','CRITICAL','WARNING','INFO'].for
 function renderUsers(){
   document.getElementById('usersTable').innerHTML=users.map(u=>`
     <tr class="border-b border-slate-800">
-      <td class="py-3"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background:#1d4ed8">${initials(u.name)}</div><span class="text-white text-sm">${u.name}</span></div></td>
+      <td class="py-3"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background:#00A07A">${initials(u.name)}</div><span class="text-white text-sm">${u.name}</span></div></td>
       <td class="py-3 text-slate-400 text-sm">${u.email}</td>
       <td class="py-3"><span class="badge" style="background:${roleBadgeColor[u.role]}33;color:${roleBadgeColor[u.role]}">${u.role}</span></td>
       <td class="py-3"><span class="badge" style="background:${u.active?'#052e16':'#1e293b'};color:${u.active?'#4ade80':'#94a3b8'}">${u.active?'ATIVO':'INATIVO'}</span></td>
       <td class="py-3 text-slate-400 text-sm">${u.last}</td>
-      <td class="py-3"><button class="text-xs text-blue-400">Editar</button></td>
+      <td class="py-3"><button class="text-xs text-emerald-400">Editar</button></td>
     </tr>`).join('');
 }
 
@@ -919,7 +922,7 @@ function switchScenarioTab(tab){
   ['list','builder','schedules'].forEach(t=>{
     document.getElementById('scenTab-'+t).classList.toggle('hidden',t!==tab);
     const btn=document.getElementById('tab-'+t);
-    btn.style.background=t===tab?'#2563eb':'';btn.style.color=t===tab?'white':'';btn.className='px-4 py-2 rounded-lg text-sm font-semibold transition '+(t===tab?'':'text-slate-400 hover:text-white');
+    btn.style.background=t===tab?'#00C896':'';btn.style.color=t===tab?'white':'';btn.className='px-4 py-2 rounded-lg text-sm font-semibold transition '+(t===tab?'':'text-slate-400 hover:text-white');
   });
   if(tab==='list')renderScenarios();
   if(tab==='schedules')renderSchedules();
@@ -1023,7 +1026,7 @@ function setListeningUI(on){
   const pageBtn=document.getElementById('voicePageBtn');
   const pageStatus=document.getElementById('voiceStatus');
   if(pageWave){pageWave.querySelectorAll('.voice-bar').forEach(b=>{b.classList.toggle('active',on);b.style.background=on?'#4ade80':'#4c1d95';});}
-  if(pageBtn){pageBtn.textContent=on?'⏹ Parar Escuta':'🎤 Iniciar Escuta';pageBtn.style.background=on?'linear-gradient(135deg,#dc2626,#ea580c)':'linear-gradient(135deg,#2563eb,#7c3aed)';}
+  if(pageBtn){pageBtn.textContent=on?'⏹ Parar Escuta':'🎤 Iniciar Escuta';pageBtn.style.background=on?'linear-gradient(135deg,#dc2626,#ea580c)':'linear-gradient(135deg,#00C896,#00A07A)';}
   if(pageStatus)pageStatus.textContent=on?'🟢 A escutar...':'Clique para começar';
 }
 
@@ -1056,7 +1059,7 @@ function addVoiceLog(who, msg, type){
     if(empty)empty.remove();
     const div=document.createElement('div');
     div.className='voice-transcript flex gap-2 items-start '+(type==='user'?'voice-user':'voice-bms');
-    div.style.cssText=type==='user'?'background:#1d4ed833;color:#93c5fd;padding:8px 12px;border-radius:10px 10px 2px 10px':'background:#05471433;color:#86efac;padding:8px 12px;border-radius:10px 10px 10px 2px';
+    div.style.cssText=type==='user'?'background:#00A07A33;color:#A7F3D0;padding:8px 12px;border-radius:10px 10px 2px 10px':'background:#05471433;color:#86efac;padding:8px 12px;border-radius:10px 10px 10px 2px';
     div.innerHTML=`<span style="font-size:11px;opacity:.6;white-space:nowrap;margin-top:2px">${type==='user'?'Você':'BMS'}</span><span style="flex:1">${msg}</span>`;
     log.appendChild(div);
     log.scrollTop=log.scrollHeight;
@@ -1242,7 +1245,7 @@ function initEnergyChart(){
   const hrs=Array.from({length:24},(_,i)=>i+'h');
   const c=[12,10,9,9,10,14,32,58,72,78,82,85,80,76,79,84,88,82,70,58,42,30,18,14];
   const s=[0,0,0,0,0,0,2,8,18,28,36,42,44,43,40,35,28,18,8,2,0,0,0,0];
-  S.charts.energy=new Chart(ctx,{type:'line',data:{labels:hrs,datasets:[{label:'Consumo kWh',data:c,borderColor:'#3b82f6',backgroundColor:'rgba(59,130,246,.15)',fill:true,tension:.4,pointRadius:0},{label:'Solar kWh',data:s,borderColor:'#fbbf24',backgroundColor:'rgba(251,191,36,.1)',fill:true,tension:.4,pointRadius:0}]},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{x:{ticks:{color:'#475569',maxTicksLimit:8}},y:{ticks:{color:'#475569'}}}}});
+  S.charts.energy=new Chart(ctx,{type:'line',data:{labels:hrs,datasets:[{label:'Consumo kWh',data:c,borderColor:'#34D399',backgroundColor:'rgba(59,130,246,.15)',fill:true,tension:.4,pointRadius:0},{label:'Solar kWh',data:s,borderColor:'#fbbf24',backgroundColor:'rgba(251,191,36,.1)',fill:true,tension:.4,pointRadius:0}]},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},scales:{x:{ticks:{color:'#475569',maxTicksLimit:8}},y:{ticks:{color:'#475569'}}}}});
 }
 function initSolarChart(){
   if(S.charts.solar)return;
