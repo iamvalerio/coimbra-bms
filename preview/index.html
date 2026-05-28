@@ -422,7 +422,7 @@ input:focus,select:focus,textarea:focus{border-color:#34D399;}
                 <div class="action-row">
                   <select class="flex-1" style="min-width:0">
                     <optgroup label="💡 Iluminação"><option>💡 Iluminação — Receção P0</option><option>💡 Iluminação — Open Space P1</option><option>💡 Iluminação — Open Space P2</option><option>💡 Iluminação — Open Space P3</option><option>💡 Iluminação — Sala Reuniões A</option><option>💡 Iluminação — Sala Reuniões B</option><option>💡 Iluminação — Cafetaria</option><option>💡 Iluminação — Fachada</option><option>💡 Iluminação — Parking</option><option>💡 Iluminação — Todos os pisos</option></optgroup>
-                    <optgroup label="🌡️ AVAC"><option>🌡️ AVAC — Open Space P1</option><option>🌡️ AVAC — Open Space P2</option><option>🌡️ AVAC — Open Space P3</option><option>🌡️ AVAC — Sala Reuniões A</option><option>🌡️ AVAC — Sala Reuniões B</option><option>🌡️ AVAC — Cafetaria</option><option>🌡️ AVAC — Data Center</option><option>🌡️ Ventilação — Renovação Ar</option><option>🌡️ AVAC — Todos</option></optgroup>
+                    <optgroup label="🌡️ AVAC"><option>🌡️ AVAC — Editorial P1</option><option>🌡️ AVAC — Editorial P2</option><option>🌡️ AVAC — Editorial P3</option><option>🌡️ AVAC — Sala Camões</option><option>🌡️ AVAC — Sala Pessoa</option><option>🌡️ AVAC — Sala Aquilino</option><option>🌡️ AVAC — Nave Principal</option><option>🌡️ AVAC — Cafetaria</option><option>🌡️ AVAC — Auditório Saramago</option><option>🌡️ Ventilação — Renovação Ar</option><option>🌡️ AVAC — Todos</option></optgroup>
                     <optgroup label="🔐 Segurança"><option>🔐 Alarme — Armar</option><option>🔐 Alarme — Desarmar</option><option>🔐 Câmeras — Modo Noturno</option><option>🔐 Controlo Acessos — Bloquear</option><option>🔐 Controlo Acessos — Desbloquear</option></optgroup>
                     <optgroup label="🛗 Elevadores"><option>🛗 Elevadores — Chamar Piso 0</option><option>🛗 Elevadores — Bloquear</option></optgroup>
                     <optgroup label="☀️ Energia"><option>☀️ Fotovoltaico — Prioridade Consumo</option><option>⚡ Equipamentos — Modo Eco</option></optgroup>
@@ -664,7 +664,7 @@ const systems=[
 const alerts=[
   {id:1,sev:'CRITICAL',msg:'Elevador 2 — Falha de comunicação',sys:'Elevadores',time:'10:32',acked:false},
   {id:2,sev:'WARNING',msg:'Consumo elétrico acima do normal — Piso 3',sys:'Elétrico',time:'09:55',acked:false},
-  {id:3,sev:'WARNING',msg:'Sensor CO₂ Sala de Reuniões A — Valor elevado (1200ppm)',sys:'AVAC',time:'09:12',acked:false},
+  {id:3,sev:'WARNING',msg:'Sensor CO₂ Sala Camões — Valor elevado (1200ppm)',sys:'AVAC',time:'09:12',acked:false},
   {id:4,sev:'INFO',msg:'Cenário "Modo Noite" ativado automaticamente',sys:'Sistema',time:'00:00',acked:true},
   {id:5,sev:'INFO',msg:'Backup da base de dados concluído',sys:'Sistema',time:'03:00',acked:true},
 ];
@@ -711,8 +711,8 @@ const scenarios=[
 const lightingZones=[
   {name:'Receção Piso 0',zone:'Piso 0',on:true,level:80},
   {name:'Open Space Piso 1',zone:'Piso 1',on:true,level:100},
-  {name:'Sala Reuniões A',zone:'Piso 1',on:false,level:60},
-  {name:'Sala Reuniões B',zone:'Piso 1',on:true,level:70},
+  {name:'Sala Camões',zone:'Piso 1',on:false,level:60},
+  {name:'Sala Pessoa',zone:'Piso 1',on:true,level:70},
   {name:'Open Space Piso 2',zone:'Piso 2',on:true,level:90},
   {name:'Cafetaria',zone:'Piso 0',on:true,level:85},
   {name:'Corredor Piso 3',zone:'Piso 3',on:false,level:50},
@@ -724,8 +724,8 @@ const hvacZones=[
   {name:'Open Space Piso 1',temp:22.4,set:22,mode:'cooling',on:true},
   {name:'Open Space Piso 2',temp:23.1,set:22,mode:'cooling',on:true},
   {name:'Open Space Piso 3',temp:21.8,set:22,mode:'off',on:false},
-  {name:'Sala Reuniões A',temp:24.2,set:21,mode:'cooling',on:true},
-  {name:'Sala Reuniões B',temp:22.0,set:22,mode:'cooling',on:true},
+  {name:'Sala Camões',temp:24.2,set:21,mode:'cooling',on:true},
+  {name:'Sala Pessoa',temp:22.0,set:22,mode:'cooling',on:true},
   {name:'Cafetaria',temp:23.5,set:23,mode:'off',on:true},
 ];
 
@@ -738,9 +738,9 @@ const elevators=[
 
 const floors=[
   {n:'Piso 4',zones:['Arquivo','Técnico'],ok:5,warn:0},
-  {n:'Piso 3',zones:['Open Space','Reuniões'],ok:8,warn:1},
-  {n:'Piso 2',zones:['Open Space','Direção'],ok:7,warn:0},
-  {n:'Piso 1',zones:['Open Space','Reuniões A/B'],ok:9,warn:1},
+  {n:'Piso 3',zones:['Editorial','Sala Aquilino'],ok:8,warn:1},
+  {n:'Piso 2',zones:['Editorial','Administração'],ok:7,warn:0},
+  {n:'Piso 1',zones:['Editorial','Sala Camões / Pessoa'],ok:9,warn:1},
   {n:'Piso 0',zones:['Receção','Cafetaria'],ok:6,warn:0},
   {n:'Cave',zones:['Parking','Técnico'],ok:4,warn:0},
 ];
@@ -1018,7 +1018,7 @@ function showTriggerOpts(val){
 document.querySelectorAll('input[name=trigger]').forEach(r=>r.addEventListener('change',()=>showTriggerOpts(r.value)));
 
 const SENSOR_OPTS=`<option>Sensor CO₂ — Reuniões A</option><option>Sensor CO₂ — Open Space P1</option><option>Sensor CO₂ — Open Space P2</option><option>Sensor Presença — Piso 1</option><option>Sensor Presença — Piso 2</option><option>Sensor Presença — Piso 3</option><option>Sensor Temperatura — AVAC Geral</option><option>Sensor Luminosidade — Fachada</option><option>Sensor Humidade — Open Space</option><option>SCI — Detetor Fumo</option><option>SCI — Botão Emergência</option><option>Hora do dia</option><option>Dia da semana</option>`;
-const DEVICE_OPTS=`<optgroup label="💡 Iluminação"><option>💡 Iluminação — Receção P0</option><option>💡 Iluminação — Open Space P1</option><option>💡 Iluminação — Open Space P2</option><option>💡 Iluminação — Open Space P3</option><option>💡 Iluminação — Sala Reuniões A</option><option>💡 Iluminação — Sala Reuniões B</option><option>💡 Iluminação — Cafetaria</option><option>💡 Iluminação — Fachada</option><option>💡 Iluminação — Parking</option><option>💡 Iluminação — Todos os pisos</option></optgroup><optgroup label="🌡️ AVAC"><option>🌡️ AVAC — Open Space P1</option><option>🌡️ AVAC — Open Space P2</option><option>🌡️ AVAC — Open Space P3</option><option>🌡️ AVAC — Sala Reuniões A</option><option>🌡️ AVAC — Sala Reuniões B</option><option>🌡️ AVAC — Cafetaria</option><option>🌡️ AVAC — Data Center</option><option>🌡️ Ventilação — Renovação Ar</option><option>🌡️ AVAC — Todos</option></optgroup><optgroup label="🔐 Segurança"><option>🔐 Alarme — Armar</option><option>🔐 Alarme — Desarmar</option><option>🔐 Câmeras — Modo Noturno</option><option>🔐 Controlo Acessos — Bloquear</option><option>🔐 Controlo Acessos — Desbloquear</option></optgroup><optgroup label="🛗 Elevadores"><option>🛗 Elevadores — Chamar Piso 0</option><option>🛗 Elevadores — Bloquear</option></optgroup><optgroup label="☀️ Energia"><option>☀️ Fotovoltaico — Prioridade Consumo</option><option>⚡ Equipamentos — Modo Eco</option></optgroup><optgroup label="📢 Comunicação"><option>📢 Difusão Áudio — Protocolo Evacuação</option><option>⚠️ Alerta — Enviar Notificação</option></optgroup>`;
+const DEVICE_OPTS=`<optgroup label="💡 Iluminação"><option>💡 Iluminação — Receção P0</option><option>💡 Iluminação — Open Space P1</option><option>💡 Iluminação — Open Space P2</option><option>💡 Iluminação — Open Space P3</option><option>💡 Iluminação — Sala Reuniões A</option><option>💡 Iluminação — Sala Reuniões B</option><option>💡 Iluminação — Cafetaria</option><option>💡 Iluminação — Fachada</option><option>💡 Iluminação — Parking</option><option>💡 Iluminação — Todos os pisos</option></optgroup><optgroup label="🌡️ AVAC"><option>🌡️ AVAC — Editorial P1</option><option>🌡️ AVAC — Editorial P2</option><option>🌡️ AVAC — Editorial P3</option><option>🌡️ AVAC — Sala Camões</option><option>🌡️ AVAC — Sala Pessoa</option><option>🌡️ AVAC — Sala Aquilino</option><option>🌡️ AVAC — Nave Principal</option><option>🌡️ AVAC — Cafetaria</option><option>🌡️ AVAC — Auditório Saramago</option><option>🌡️ Ventilação — Renovação Ar</option><option>🌡️ AVAC — Todos</option></optgroup><optgroup label="🔐 Segurança"><option>🔐 Alarme — Armar</option><option>🔐 Alarme — Desarmar</option><option>🔐 Câmeras — Modo Noturno</option><option>🔐 Controlo Acessos — Bloquear</option><option>🔐 Controlo Acessos — Desbloquear</option></optgroup><optgroup label="🛗 Elevadores"><option>🛗 Elevadores — Chamar Piso 0</option><option>🛗 Elevadores — Bloquear</option></optgroup><optgroup label="☀️ Energia"><option>☀️ Fotovoltaico — Prioridade Consumo</option><option>⚡ Equipamentos — Modo Eco</option></optgroup><optgroup label="📢 Comunicação"><option>📢 Difusão Áudio — Protocolo Evacuação</option><option>⚠️ Alerta — Enviar Notificação</option></optgroup>`;
 
 function addCondition(){
   const c=document.getElementById('conditionsList');
@@ -1190,7 +1190,7 @@ function interpretCommand(c, orig){
     }
     const avg=(hvacZones.reduce((a,z)=>a+z.temp,0)/hvacZones.length).toFixed(1);
     if(c.includes('qual')||c.includes('como')||c.includes('temperatura')){
-      return `🌡️ Temperatura média atual: ${avg}°C. Piso 1: ${hvacZones[0].temp}°C · Piso 2: ${hvacZones[1].temp}°C · Sala Reuniões: ${hvacZones[3].temp}°C`;
+      return `🌡️ Temperatura média atual: ${avg}°C. Piso 1: ${hvacZones[0].temp}°C · Piso 2: ${hvacZones[1].temp}°C · Sala Camões: ${hvacZones[3].temp}°C`;
     }
     return `A temperatura média atual é ${avg}°C. Para ajustar, diga por exemplo "Põe o AVAC a 22 graus".`;
   }
@@ -1307,52 +1307,52 @@ const FP_FLOORS=[
     {id:'inst-cv', name:'Instalações',    x:854, y:0,   w:144, h:598, type:'technical', lights:true,  lvl:100, temp:26,  setpt:null, occ:0,  co2:400, alerts:['Temp. elevada']},
   ]},
   /* ── PISO 0 ── Bloco A (L) + Nave + Bloco B + Ala Serviços ── */
-  {id:'p0',label:'Piso 0',sub:'Bloco A · Nave Principal · Bloco B',rooms:[
-    /* Bloco A — topo esquerdo: Cafetaria/Restaurante */
-    {id:'cafet',   name:'Cafetaria',         x:0,   y:0,   w:332, h:212, type:'cafeteria', lights:true,  lvl:90,  temp:23.2,setpt:22,  occ:70, co2:820, alerts:['CO₂ elevado']},
+  {id:'p0',label:'Piso 0',sub:'Cafetaria · Nave Principal · Auditório Saramago',rooms:[
+    /* Bloco A — topo esquerdo: Cafetaria */
+    {id:'cafet',   name:'Cafetaria',            x:0,   y:0,   w:332, h:212, type:'cafeteria', lights:true,  lvl:90,  temp:23.2,setpt:22,  occ:70, co2:820, alerts:['CO₂ elevado']},
     /* Bloco A — topo centro: Circulação/Escadas */
-    {id:'circ-p0', name:'Circulação',         x:334, y:0,   w:90,  h:212, type:'core',      lights:true,  lvl:100, temp:20,  setpt:null,occ:10, co2:420, alerts:[]},
-    /* Bloco A — topo direito: Open Space */
-    {id:'os-a',    name:'Open Space A',       x:426, y:0,   w:414, h:212, type:'office',    lights:true,  lvl:100, temp:22.4,setpt:22,  occ:85, co2:940, alerts:['CO₂ elevado']},
+    {id:'circ-p0', name:'Circulação',            x:334, y:0,   w:90,  h:212, type:'core',      lights:true,  lvl:100, temp:20,  setpt:null,occ:10, co2:420, alerts:[]},
+    /* Bloco A — topo direito: Open Space editorial */
+    {id:'os-a',    name:'Open Space — Bloco A',  x:426, y:0,   w:414, h:212, type:'office',    lights:true,  lvl:100, temp:22.4,setpt:22,  occ:85, co2:940, alerts:['CO₂ elevado']},
     /* Bloco A — inferior esquerdo: Receção */
-    {id:'recep',   name:'Receção / Lobby',    x:0,   y:214, w:288, h:172, type:'reception', lights:true,  lvl:85,  temp:21.5,setpt:22,  occ:62, co2:650, alerts:[]},
-    /* Bloco A — inferior: Sala A0 */
-    {id:'sala-a0', name:'Sala A0',            x:0,   y:388, w:288, h:204, type:'meeting',   lights:false, lvl:0,   temp:21.8,setpt:21,  occ:0,  co2:560, alerts:[]},
+    {id:'recep',   name:'Receção',               x:0,   y:214, w:288, h:172, type:'reception', lights:true,  lvl:85,  temp:21.5,setpt:22,  occ:62, co2:650, alerts:[]},
+    /* Bloco A — inferior: Sala Torga (Miguel Torga — Coimbra) */
+    {id:'sala-a0', name:'Sala Torga',            x:0,   y:388, w:288, h:204, type:'meeting',   lights:false, lvl:0,   temp:21.8,setpt:21,  occ:0,  co2:560, alerts:[]},
     /* Nave Principal — zona central */
-    {id:'nave',    name:'Nave Principal',     x:290, y:214, w:550, h:172, type:'hall',      lights:false, lvl:0,   temp:19,  setpt:21,  occ:0,  co2:400, alerts:[]},
-    /* Bloco B — Cozinha/Bar */
-    {id:'coz',     name:'Cozinha / Bar',      x:290, y:388, w:104, h:204, type:'cafeteria', lights:true,  lvl:80,  temp:24,  setpt:22,  occ:30, co2:580, alerts:[]},
-    /* Bloco B — Auditório */
-    {id:'audit-b', name:'Auditório B',        x:396, y:388, w:282, h:204, type:'hall',      lights:false, lvl:0,   temp:20,  setpt:20,  occ:0,  co2:400, alerts:[]},
+    {id:'nave',    name:'Nave Principal',        x:290, y:214, w:550, h:172, type:'hall',      lights:false, lvl:0,   temp:19,  setpt:21,  occ:0,  co2:400, alerts:[]},
+    /* Bloco B — Copa/Bar */
+    {id:'coz',     name:'Copa / Bar',            x:290, y:388, w:104, h:204, type:'cafeteria', lights:true,  lvl:80,  temp:24,  setpt:22,  occ:30, co2:580, alerts:[]},
+    /* Bloco B — Auditório Saramago (José Saramago — Nobel) */
+    {id:'audit-b', name:'Auditório Saramago',    x:396, y:388, w:282, h:204, type:'hall',      lights:false, lvl:0,   temp:20,  setpt:20,  occ:0,  co2:400, alerts:[]},
     /* Bloco B — Sala Conferências */
-    {id:'conf-b',  name:'Sala Conferências B',x:680, y:388, w:160, h:204, type:'meeting',   lights:true,  lvl:70,  temp:22.5,setpt:21,  occ:58, co2:740, alerts:[]},
+    {id:'conf-b',  name:'Sala de Conferências',  x:680, y:388, w:160, h:204, type:'meeting',   lights:true,  lvl:70,  temp:22.5,setpt:21,  occ:58, co2:740, alerts:[]},
     /* Ala de Serviços (direita) */
-    {id:'serv-rw', name:'Serviços / Técnico', x:842, y:0,   w:152, h:196, type:'technical', lights:true,  lvl:100, temp:24,  setpt:null,occ:2,  co2:420, alerts:[]},
-    {id:'wc-p0',   name:'WC',                 x:842, y:198, w:152, h:130, type:'wc',        lights:true,  lvl:100, temp:20,  setpt:null,occ:8,  co2:480, alerts:[]},
-    {id:'core-p0', name:'Elevadores',         x:842, y:330, w:152, h:130, type:'core',      lights:true,  lvl:100, temp:19,  setpt:null,occ:3,  co2:420, alerts:[]},
-    {id:'arr-rw',  name:'Arquivo / Arrumos',  x:842, y:462, w:152, h:130, type:'archive',   lights:false, lvl:0,   temp:18,  setpt:null,occ:0,  co2:400, alerts:[]},
+    {id:'serv-rw', name:'Instalações Técnicas',  x:842, y:0,   w:152, h:196, type:'technical', lights:true,  lvl:100, temp:24,  setpt:null,occ:2,  co2:420, alerts:[]},
+    {id:'wc-p0',   name:'WC',                    x:842, y:198, w:152, h:130, type:'wc',        lights:true,  lvl:100, temp:20,  setpt:null,occ:8,  co2:480, alerts:[]},
+    {id:'core-p0', name:'Elevadores / Escadas',  x:842, y:330, w:152, h:130, type:'core',      lights:true,  lvl:100, temp:19,  setpt:null,occ:3,  co2:420, alerts:[]},
+    {id:'arr-rw',  name:'Arquivo Morto',         x:842, y:462, w:152, h:130, type:'archive',   lights:false, lvl:0,   temp:18,  setpt:null,occ:0,  co2:400, alerts:[]},
   ]},
   /* ── PISO 1 ── */
-  {id:'p1',label:'Piso 1',sub:'Open Space · Reuniões A/B',rooms:[
-    {id:'os-p1',  name:'Open Space',      x:0,   y:0,   w:636, h:598, type:'office',  lights:true,  lvl:100, temp:22.4,setpt:22,occ:87,co2:940,alerts:['CO₂ elevado']},
-    {id:'reu-a',  name:'Sala Reuniões A', x:638, y:0,   w:360, h:237, type:'meeting', lights:false, lvl:0,   temp:21.8,setpt:21,occ:0, co2:560,alerts:[]},
-    {id:'reu-b',  name:'Sala Reuniões B', x:638, y:239, w:360, h:237, type:'meeting', lights:true,  lvl:70,  temp:22.5,setpt:21,occ:58,co2:740,alerts:[]},
+  {id:'p1',label:'Piso 1',sub:'Editorial · Sala Camões · Sala Pessoa',rooms:[
+    {id:'os-p1',  name:'Editorial — P1',   x:0,   y:0,   w:636, h:598, type:'office',  lights:true,  lvl:100, temp:22.4,setpt:22,occ:87,co2:940,alerts:['CO₂ elevado']},
+    {id:'reu-a',  name:'Sala Camões',      x:638, y:0,   w:360, h:237, type:'meeting', lights:false, lvl:0,   temp:21.8,setpt:21,occ:0, co2:560,alerts:[]},
+    {id:'reu-b',  name:'Sala Pessoa',      x:638, y:239, w:360, h:237, type:'meeting', lights:true,  lvl:70,  temp:22.5,setpt:21,occ:58,co2:740,alerts:[]},
     {id:'wc-p1',  name:'WC',              x:638, y:478, w:176, h:120, type:'wc',      lights:true,  lvl:100, temp:20,  setpt:null,occ:4,co2:450,alerts:[]},
     {id:'core-p1',name:'Circulação',      x:816, y:478, w:182, h:120, type:'core',    lights:true,  lvl:100, temp:19,  setpt:null,occ:0,co2:420,alerts:[]},
   ]},
   /* ── PISO 2 ── */
-  {id:'p2',label:'Piso 2',sub:'Open Space · Direção',rooms:[
-    {id:'os-p2',  name:'Open Space',   x:0,   y:0,   w:636, h:598, type:'office',  lights:true,  lvl:95, temp:23.1,setpt:22,occ:74,co2:810,alerts:[]},
-    {id:'dir',    name:'Direção',      x:638, y:0,   w:360, h:300, type:'meeting', lights:true,  lvl:60, temp:22.8,setpt:22,occ:40,co2:610,alerts:[]},
-    {id:'wc-p2',  name:'WC',          x:638, y:302, w:176, h:296, type:'wc',      lights:false, lvl:0,  temp:20,  setpt:null,occ:2,co2:440,alerts:[]},
-    {id:'core-p2',name:'Circulação',  x:816, y:302, w:182, h:296, type:'core',    lights:true,  lvl:100,temp:19,  setpt:null,occ:0,co2:420,alerts:[]},
+  {id:'p2',label:'Piso 2',sub:'Editorial · Sala Eça · Administração',rooms:[
+    {id:'os-p2',  name:'Editorial — P2',   x:0,   y:0,   w:636, h:598, type:'office',  lights:true,  lvl:95, temp:23.1,setpt:22,occ:74,co2:810,alerts:[]},
+    {id:'dir',    name:'Administração',    x:638, y:0,   w:360, h:300, type:'meeting', lights:true,  lvl:60, temp:22.8,setpt:22,occ:40,co2:610,alerts:[]},
+    {id:'wc-p2',  name:'WC',              x:638, y:302, w:176, h:296, type:'wc',      lights:false, lvl:0,  temp:20,  setpt:null,occ:2,co2:440,alerts:[]},
+    {id:'core-p2',name:'Circulação',      x:816, y:302, w:182, h:296, type:'core',    lights:true,  lvl:100,temp:19,  setpt:null,occ:0,co2:420,alerts:[]},
   ]},
   /* ── PISO 3 ── */
-  {id:'p3',label:'Piso 3',sub:'Open Space · Sala Reuniões',rooms:[
-    {id:'os-p3',  name:'Open Space',      x:0,   y:0,   w:636, h:598, type:'office',  lights:true,  lvl:100,temp:21.8,setpt:22,occ:65,co2:720,alerts:[]},
-    {id:'reu-p3', name:'Sala Reuniões',   x:638, y:0,   w:360, h:332, type:'meeting', lights:true,  lvl:80, temp:21.5,setpt:21,occ:30,co2:620,alerts:[]},
-    {id:'wc-p3',  name:'WC',             x:638, y:334, w:176, h:264, type:'wc',      lights:false, lvl:0,  temp:20,  setpt:null,occ:0,co2:430,alerts:[]},
-    {id:'core-p3',name:'Circulação',     x:816, y:334, w:182, h:264, type:'core',    lights:true,  lvl:100,temp:19,  setpt:null,occ:0,co2:420,alerts:[]},
+  {id:'p3',label:'Piso 3',sub:'Editorial · Sala Aquilino · Sala Eça',rooms:[
+    {id:'os-p3',  name:'Editorial — P3',   x:0,   y:0,   w:636, h:598, type:'office',  lights:true,  lvl:100,temp:21.8,setpt:22,occ:65,co2:720,alerts:[]},
+    {id:'reu-p3', name:'Sala Aquilino',    x:638, y:0,   w:360, h:332, type:'meeting', lights:true,  lvl:80, temp:21.5,setpt:21,occ:30,co2:620,alerts:[]},
+    {id:'wc-p3',  name:'WC',              x:638, y:334, w:176, h:264, type:'wc',      lights:false, lvl:0,  temp:20,  setpt:null,occ:0,co2:430,alerts:[]},
+    {id:'core-p3',name:'Circulação',      x:816, y:334, w:182, h:264, type:'core',    lights:true,  lvl:100,temp:19,  setpt:null,occ:0,co2:420,alerts:[]},
   ]},
   /* ── PISO 4 ── */
   {id:'p4',label:'Piso 4',sub:'Arquivo · Técnico',rooms:[
