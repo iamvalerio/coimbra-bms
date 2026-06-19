@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "$json = $input | ConvertFrom-Json; $date = Get-Date -Format 'yyyy-MM-dd HH:mm'; $sid = $json.session_id; $entry = \"`n> ⏱️ **Sessão encerrada:** $date | session: $sid\"; Add-Content -Encoding UTF8 -Path \"C:\\Users\\mfvalerio\\OneDrive - CRITICAL SOFTWARE, S.A\\00_AI Projects\\OUTPUTS\\coimbra-bms\\CLAUDE.md\" -Value $entry",
+            "statusMessage": "A guardar sessão no CLAUDE.md...",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

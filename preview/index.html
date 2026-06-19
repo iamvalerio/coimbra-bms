@@ -802,6 +802,8 @@ function showPage(id,el){
     document.getElementById('page-floorplan').style.display='flex';
     setTimeout(fpRender,50);
   }
+  S.currentPage=id;
+  lsSave();
 }
 
 // ============================================================
@@ -1871,15 +1873,59 @@ function simulate(){const h=new Date().getHours();const base=[0,0,0,0,0,0,1,5,15
 function showToast(msg){const t=document.createElement('div');t.className='fixed bottom-6 right-24 px-4 py-3 rounded-xl text-white text-sm font-semibold z-50';t.style.cssText='background:#065f46;border:1px solid #166534;box-shadow:0 4px 24px rgba(0,0,0,.5);animation:slideIn .2s ease';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3000);}
 
 // ============================================================
+// PERSISTÊNCIA — localStorage
+// ============================================================
+const LS_KEY = 'salazar_bms_v1';
+
+function lsSave(){
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      lighting: lightingZones.map(z=>({on:z.on,level:z.level})),
+      hvac: hvacZones.map(z=>({set:z.set,mode:z.mode,on:z.on})),
+      scenarios: scenarios.map(z=>z.active),
+      lastPage: S.currentPage||'dashboard',
+      fpFloor: typeof fpCurrentFloor!=='undefined'?fpCurrentFloor:0,
+      fpOverlay: typeof fpOverlay!=='undefined'?fpOverlay:'default'
+    }));
+  } catch(e){}
+}
+
+function lsLoad(){
+  try {
+    const d=JSON.parse(localStorage.getItem(LS_KEY)||'{}');
+    if(d.lighting) d.lighting.forEach((s,i)=>{if(lightingZones[i]){lightingZones[i].on=s.on;lightingZones[i].level=s.level;}});
+    if(d.hvac) d.hvac.forEach((s,i)=>{if(hvacZones[i]){hvacZones[i].set=s.set;hvacZones[i].mode=s.mode;hvacZones[i].on=s.on;}});
+    if(d.scenarios) d.scenarios.forEach((a,i)=>{if(scenarios[i])scenarios[i].active=a;});
+    if(d.fpFloor&&typeof fpCurrentFloor!=='undefined') fpCurrentFloor=d.fpFloor;
+    if(d.fpOverlay&&typeof fpOverlay!=='undefined') fpOverlay=d.fpOverlay;
+    return d.lastPage||'dashboard';
+  } catch(e){ return 'dashboard'; }
+}
+
+// Hooks de persistência automática
+const _origToggleLight=window.toggleLight;
+window.toggleLight=function(i,el){_origToggleLight&&_origToggleLight(i,el);lsSave();};
+const _origSetLightLevel=window.setLightLevel;
+window.setLightLevel=function(i,v){_origSetLightLevel&&_origSetLightLevel(i,v);lsSave();};
+
+// ============================================================
 // INIT
 // ============================================================
 function initApp(){
+  const lastPage = lsLoad();
   renderSystemsGrid();renderAlertsList();renderFloorMap();
   renderLighting();renderHVAC();renderElevators();
   renderElectrical();renderFire();renderSecurity();
   renderScenarios();renderAlertsFull();renderUsers();renderUptime();
   initEnergyChart();
-  updateClock();setInterval(updateClock,1000);setInterval(simulate,5000);
+  updateClock();setInterval(updateClock,1000);
+  setInterval(simulate,5000);
+  setInterval(lsSave,30000);
+  // Restaurar última página visitada
+  if(lastPage && lastPage!=='dashboard'){
+    const navEl=document.querySelector(`.nav-item[onclick*="'${lastPage}'"]`);
+    showPage(lastPage,navEl);
+  }
   // Auto-greet in voice log after 1s
   setTimeout(()=>{
     if(!document.getElementById('vpLog').querySelector('.voice-bms')){
