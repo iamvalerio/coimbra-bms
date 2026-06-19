@@ -1732,51 +1732,112 @@ function fpOpenPanel(id){
   wrap.classList.add('open');
   const tc=FP_TYPE[r.type]?.label||'#94a3b8';
   const icon=FP_TYPE[r.type]?.icon||'🏠';
+  const flLabel=fl.label;
+
+  // --- Enrich with real lightingZones data ---
+  const lzMatch=lightingZones.find(z=>z.name===r.name||z.name.includes(r.name)||r.name.includes(z.name));
+  const roomLightOn  = lzMatch ? lzMatch.on  : r.lights;
+  const roomLightLvl = lzMatch ? lzMatch.level: r.lvl;
+  // Keep r in sync so controls work
+  if(lzMatch){r.lights=lzMatch.on;r.lvl=lzMatch.level;}
+
+  // --- Enrich with real hvacZones data ---
+  const hzMatch=hvacZones.find(z=>z.name===r.name||z.name.includes(r.name)||r.name.includes(z.name));
+  const roomTemp = hzMatch ? hzMatch.temp : r.temp;
+  const roomSetpt= hzMatch ? hzMatch.set  : r.setpt;
+  const roomHvacOn=hzMatch ? hzMatch.on   : (r.setpt!==null);
+  if(hzMatch){r.temp=hzMatch.temp;r.setpt=hzMatch.set;}
+
+  // --- Seeded occupancy (consistent per room ID) ---
+  function seededOcc(seed){let h=0;for(let i=0;i<seed.length;i++){h=((h<<5)-h)+seed.charCodeAt(i);h|=0;}return Math.abs(h%20);}
+  const occPeople = r.occ>0 ? Math.round(r.occ/5) : seededOcc(r.id);
+  const occPct = r.occ;
+
+  // --- Alerts from global alerts array (match by room name or floor) ---
+  const globalAlerts = (typeof alerts!=='undefined'?alerts:[]).filter(a=>{
+    const msg=(a.msg||'').toLowerCase();
+    const rn=r.name.toLowerCase();
+    return msg.includes(rn)||rn.split(' ').some(w=>w.length>3&&msg.includes(w));
+  });
+  const roomAlerts=[...(r.alerts||[]).map(a=>({sev:'WARNING',msg:a,sys:'Sala'})),...globalAlerts];
+
+  // --- Module navigation map ---
+  const typeToModule={office:'lighting',meeting:'lighting',hall:'lighting',reception:'lighting',cafeteria:'lighting',core:'elevator',wc:null,technical:'electrical',parking:'security',archive:null};
+  const navModule=typeToModule[r.type]||null;
+  // If hvac available, also offer hvac link
+  const hasHvac=roomSetpt!==null;
+
+  // --- Alert severity styling ---
+  function alertStyle(sev){
+    if(sev==='CRITICAL')return'background:#2b0808;color:#f87171;border:1px solid #7f1d1d';
+    if(sev==='WARNING')return'background:#2b1a00;color:#fbbf24;border:1px solid #78350f';
+    return'background:#0a1a2b;color:#7dd3fc;border:1px solid #1e3a5f';
+  }
+  function alertIcon(sev){return sev==='CRITICAL'?'🔴':sev==='WARNING'?'⚠️':'ℹ️';}
+
   cont.innerHTML=`
-    <div class="flex items-start justify-between mb-4">
-      <div>
-        <div class="text-xl mb-1">${icon}</div>
-        <div class="font-bold text-white text-sm">${r.name}</div>
-        <div class="text-xs text-slate-500">${FP_FLOORS.find(f=>f.id===fpFloor).label}</div>
+    <div style="border-bottom:1px solid #334155;padding-bottom:12px;margin-bottom:14px">
+      <div class="flex items-start justify-between">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:40px;height:40px;border-radius:10px;background:#0f172a;display:flex;align-items:center;justify-content:center;font-size:20px;border:1px solid #334155">${icon}</div>
+          <div>
+            <div class="font-bold text-white" style="font-size:14px;line-height:1.2">${r.name}</div>
+            <div style="font-size:11px;color:#64748b;margin-top:2px">${flLabel} · ${r.type}</div>
+          </div>
+        </div>
+        <button onclick="fpClosePanel()" style="color:#475569;font-size:20px;background:none;border:none;cursor:pointer;line-height:1;padding:4px">✕</button>
       </div>
-      <button onclick="fpClosePanel()" style="color:#64748b;font-size:18px;background:none;border:none;cursor:pointer;line-height:1">✕</button>
     </div>
+
+    <!-- KPIs -->
     <div class="grid grid-cols-2 gap-2 mb-3">
-      <div class="p-2 rounded-lg" style="background:#0f172a">
-        <div class="text-xs text-slate-500 mb-1">TEMPERATURA</div>
-        <div class="font-bold text-white">${r.temp}°C</div>
-        ${r.setpt!==null?`<div class="text-xs" style="color:#00C896">Alvo ${r.setpt}°C</div>`:'<div class="text-xs text-slate-600">Sem alvo</div>'}
+      <div class="p-2 rounded-lg" style="background:#0f172a;border:1px solid #1e293b">
+        <div style="font-size:10px;color:#64748b;font-weight:700;letter-spacing:.05em;margin-bottom:4px">TEMPERATURA</div>
+        <div style="font-size:18px;font-weight:700;color:#fff">${roomTemp}°C</div>
+        ${roomSetpt!==null?`<div style="font-size:11px;color:#00C896">alvo ${roomSetpt}°C</div>`:`<div style="font-size:11px;color:#475569">sem AVAC</div>`}
       </div>
-      <div class="p-2 rounded-lg" style="background:#0f172a">
-        <div class="text-xs text-slate-500 mb-1">OCUPAÇÃO</div>
-        <div class="font-bold text-white">${r.occ}%</div>
-        <div class="w-full rounded mt-1" style="height:3px;background:#334155"><div style="width:${r.occ}%;height:100%;background:#00C896;border-radius:9px"></div></div>
+      <div class="p-2 rounded-lg" style="background:#0f172a;border:1px solid #1e293b">
+        <div style="font-size:10px;color:#64748b;font-weight:700;letter-spacing:.05em;margin-bottom:4px">OCUPAÇÃO</div>
+        <div style="font-size:18px;font-weight:700;color:#fff">${occPeople} <span style="font-size:12px;color:#64748b">pessoas</span></div>
+        <div style="width:100%;height:3px;background:#334155;border-radius:2px;margin-top:4px"><div style="width:${Math.min(occPct,100)}%;height:100%;background:#00C896;border-radius:2px"></div></div>
       </div>
     </div>
-    ${r.co2?`<div class="p-2 rounded-lg mb-3 flex items-center justify-between" style="background:#0f172a">
-      <div><div class="text-xs text-slate-500">CO₂</div><div class="font-bold ${r.co2>1000?'text-red-400':r.co2>800?'text-yellow-400':'text-green-400'}">${r.co2} ppm</div></div>
-      <div class="text-xs ${r.co2>1000?'text-red-400':r.co2>800?'text-yellow-500':'text-slate-500'}">${r.co2>1000?'⚠️ Crítico':r.co2>800?'⚡ Elevado':'✓ Normal'}</div>
+    ${r.co2?`<div class="p-2 rounded-lg mb-3 flex items-center justify-between" style="background:#0f172a;border:1px solid #1e293b">
+      <div><div style="font-size:10px;color:#64748b;font-weight:700;letter-spacing:.05em">CO₂</div><div style="font-weight:700;font-size:15px" class="${r.co2>1000?'text-red-400':r.co2>800?'text-yellow-400':'text-green-400'}">${r.co2} ppm</div></div>
+      <div style="font-size:11px" class="${r.co2>1000?'text-red-400':r.co2>800?'text-yellow-400':'text-slate-500'}">${r.co2>1000?'⚠️ Crítico':r.co2>800?'⚡ Elevado':'✓ Normal'}</div>
     </div>`:''}
-    <div class="text-xs font-bold text-slate-500 mb-2 mt-3 tracking-wider">CONTROLO</div>
-    <div class="p-3 rounded-lg mb-2" style="background:#0f172a">
+
+    <!-- Controlo Iluminação -->
+    <div style="font-size:10px;color:#64748b;font-weight:700;letter-spacing:.08em;margin:14px 0 8px">CONTROLO</div>
+    <div class="p-3 rounded-lg mb-2" style="background:#0f172a;border:1px solid #1e293b">
       <div class="flex items-center justify-between mb-2">
-        <span class="text-sm text-white">💡 Iluminação</span>
-        <div class="toggle ${r.lights?'on':''}" onclick="fpToggleLight('${r.id}')"></div>
+        <span style="font-size:13px;color:#f1f5f9">💡 Iluminação</span>
+        <div class="toggle ${roomLightOn?'on':''}" onclick="fpToggleLight('${r.id}')"></div>
       </div>
-      ${r.lights?`<div><div class="text-xs text-slate-500 mb-1">Intensidade: <span id="fp-lvl-${r.id}">${r.lvl}</span>%</div>
-      <input type="range" class="slider w-full" min="10" max="100" value="${r.lvl}" oninput="fpSetLevel('${r.id}',this.value)"></div>`:''}
+      ${roomLightOn?`<div><div style="font-size:11px;color:#64748b;margin-bottom:4px">Intensidade: <span id="fp-lvl-${r.id}" style="color:#00C896;font-weight:700">${roomLightLvl}%</span></div>
+      <input type="range" class="slider w-full" min="10" max="100" value="${roomLightLvl}" oninput="fpSetLevel('${r.id}',this.value)"></div>`:'<div style="font-size:11px;color:#475569">Desligada</div>'}
+      ${lzMatch?`<div style="font-size:10px;color:#475569;margin-top:6px">Fonte: módulo Iluminação</div>`:''}
     </div>
-    ${r.setpt!==null?`<div class="p-3 rounded-lg mb-2" style="background:#0f172a">
-      <div class="text-sm text-white mb-2">🌡️ AVAC</div>
+    ${roomSetpt!==null?`<div class="p-3 rounded-lg mb-2" style="background:#0f172a;border:1px solid #1e293b">
+      <div style="font-size:13px;color:#f1f5f9;margin-bottom:10px">🌡️ AVAC ${roomHvacOn?'<span style="color:#00C896;font-size:10px">● ON</span>':'<span style="color:#475569;font-size:10px">● OFF</span>'}</div>
       <div class="flex items-center justify-center gap-4">
         <button onclick="fpAdjTemp('${r.id}',-1)" class="btn btn-ghost" style="width:32px;height:32px;padding:0;font-size:18px">−</button>
-        <div class="text-center"><div id="fp-setpt-${r.id}" class="font-bold text-white text-xl">${r.setpt}°C</div><div class="text-xs text-slate-500">setpoint</div></div>
+        <div class="text-center"><div id="fp-setpt-${r.id}" style="font-weight:700;color:#fff;font-size:22px">${roomSetpt}°C</div><div style="font-size:10px;color:#64748b">setpoint</div></div>
         <button onclick="fpAdjTemp('${r.id}',+1)" class="btn btn-ghost" style="width:32px;height:32px;padding:0;font-size:18px">+</button>
       </div>
+      ${hzMatch?`<div style="font-size:10px;color:#475569;margin-top:8px;text-align:center">Fonte: módulo AVAC</div>`:''}
     </div>`:''}
-    ${r.alerts&&r.alerts.length?`<div class="text-xs font-bold text-slate-500 mb-2 mt-3 tracking-wider">ALERTAS</div>
-    ${r.alerts.map(a=>`<div class="p-2 rounded-lg mb-1 text-xs flex items-center gap-2" style="background:#2b0808;color:#f87171;border:1px solid #7f1d1d"><span>⚠️</span>${a}</div>`).join('')}`:''}
-    <button onclick="fpClosePanel()" class="btn btn-ghost w-full mt-3 text-xs">Fechar painel</button>`;
+
+    <!-- Alertas -->
+    ${roomAlerts.length?`<div style="font-size:10px;color:#64748b;font-weight:700;letter-spacing:.08em;margin:14px 0 8px">ALERTAS (${roomAlerts.length})</div>
+    ${roomAlerts.map(a=>`<div class="p-2 rounded-lg mb-1 flex items-start gap-2" style="font-size:12px;${alertStyle(a.sev)}"><span style="flex-shrink:0">${alertIcon(a.sev)}</span><div><div style="font-weight:600">${a.msg}</div>${a.sys?`<div style="opacity:.7;font-size:10px;margin-top:1px">${a.sys}${a.time?' · '+a.time:''}</div>`:''}</div></div>`).join('')}`:'<div style="font-size:11px;color:#334155;margin:10px 0">Sem alertas activos nesta zona.</div>'}
+
+    <!-- Botões de módulo -->
+    <div style="margin-top:16px;display:flex;flex-direction:column;gap:6px">
+      ${navModule?`<button onclick="showPage('${navModule}');fpClosePanel();" class="btn btn-primary w-full" style="font-size:12px">Ver módulo: ${navModule==='lighting'?'Iluminação':navModule==='elevator'?'Elevadores':navModule==='electrical'?'Elétrico':navModule==='security'?'Segurança':navModule} →</button>`:''}
+      ${hasHvac?`<button onclick="showPage('hvac');fpClosePanel();" class="btn btn-ghost w-full" style="font-size:12px">Ver módulo: AVAC →</button>`:''}
+      <button onclick="fpClosePanel()" class="btn btn-ghost w-full" style="font-size:12px;color:#475569">Fechar</button>
+    </div>`;
 }
 function fpClosePanel(){fpSelected=null;fpClosePanelAnimate();fpRender();}
 function fpClosePanelAnimate(){document.getElementById('fpPanelWrap').classList.remove('open');}
@@ -1785,13 +1846,23 @@ function fpToggleLight(id){
   const r=fl&&fl.rooms.find(x=>x.id===id);
   if(!r)return;
   r.lights=!r.lights;
+  // Sync com lightingZones real
+  const lz=lightingZones.find(z=>z.name===r.name||z.name.includes(r.name)||r.name.includes(z.name));
+  if(lz)lz.on=r.lights;
+  lsSave();
   fpOpenPanel(id);fpRender();
   showToast(`💡 ${r.name} — ${r.lights?'Ligado':'Desligado'}`);
 }
 function fpSetLevel(id,val){
   const fl=FP_FLOORS.find(f=>f.id===fpFloor);
   const r=fl&&fl.rooms.find(x=>x.id===id);
-  if(r){r.lvl=parseInt(val);const el=document.getElementById('fp-lvl-'+id);if(el)el.textContent=val;}
+  if(r){
+    r.lvl=parseInt(val);
+    const lz=lightingZones.find(z=>z.name===r.name||z.name.includes(r.name)||r.name.includes(z.name));
+    if(lz)lz.level=r.lvl;
+    const el=document.getElementById('fp-lvl-'+id);if(el)el.textContent=val;
+    lsSave();
+  }
   fpRender();
 }
 function fpAdjTemp(id,delta){
