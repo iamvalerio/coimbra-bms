@@ -91,9 +91,32 @@ input:focus,select:focus,textarea:focus{border-color:#34D399;}
 .fp-panel-wrap.open{width:288px;}
 @keyframes fpPulse{0%,100%{r:5}50%{r:8}}
 @keyframes fpBlink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Critical Alert Toasts */
+#toastContainer{position:fixed;top:72px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;}
+.critical-toast{pointer-events:all;display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-radius:12px;min-width:300px;max-width:360px;animation:toastIn .3s ease;box-shadow:0 8px 32px rgba(0,0,0,.6);background:#3b0d0d;border:1px solid #dc2626;}
+.critical-toast.removing{animation:toastOut .3s ease forwards;}
+@keyframes toastIn{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+@keyframes toastOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(40px)}}
+.toast-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.toast-body{flex:1;min-width:0;}
+.toast-title{font-size:11px;font-weight:700;letter-spacing:.08em;color:#fca5a5;margin-bottom:2px;}
+.toast-msg{font-size:13px;color:#fee2e2;line-height:1.4;}
+.toast-actions{display:flex;gap:6px;margin-top:8px;}
+.toast-btn-ver{font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;border:none;cursor:pointer;background:#dc2626;color:#fff;}
+.toast-btn-ver:hover{background:#b91c1c;}
+.toast-btn-close{font-size:11px;font-weight:700;padding:3px 10px;border-radius:6px;border:1px solid #7f1d1d;cursor:pointer;background:transparent;color:#fca5a5;}
+.toast-bar{height:3px;border-radius:2px;background:#dc2626;margin-top:10px;transition:width linear;}
+
+/* Bell badge pulse */
+@keyframes badgePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+.badge-pulse{animation:badgePulse .6s ease 3;}
 </style>
 </head>
 <body>
+
+<!-- TOAST CONTAINER -->
+<div id="toastContainer"></div>
 
 <!-- LOGIN PAGE -->
 <div id="loginPage" class="login-page min-h-screen items-center justify-center" style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%)">
@@ -197,9 +220,9 @@ input:focus,select:focus,textarea:focus{border-color:#34D399;}
       <div><h1 id="pageTitle" class="font-bold text-white text-lg">Dashboard</h1><div class="text-xs text-slate-400">SALAZAR | CBR Editora · Piso 1–5</div></div>
       <div class="flex items-center gap-4">
         <div id="clock" class="text-sm text-slate-400 hidden md:block"></div>
-        <button onclick="showPage('alerts',null)" class="relative p-2 rounded-lg text-slate-400 hover:text-white" style="background:#1e293b">
+        <button onclick="goToAlerts()" class="relative p-2 rounded-lg text-slate-400 hover:text-white" style="background:#1e293b">
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          <span class="absolute -top-1 -right-1 w-4 h-4 rounded-full text-xs flex items-center justify-center font-bold" style="background:#dc2626;color:white">3</span>
+          <span id="bellBadge" class="absolute -top-1 -right-1 w-4 h-4 rounded-full text-xs flex items-center justify-center font-bold" style="background:#dc2626;color:white;display:none"></span>
         </button>
         <!-- Voice quick button in topbar -->
         <button onclick="toggleVoicePanel()" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold" style="background:linear-gradient(135deg,#00C89622,#7c3aed22);border:1px solid #34D39955;color:#A7F3D0">
@@ -965,7 +988,7 @@ function renderAlertsFull(){
       ${!a.acked?`<button class="btn btn-ghost btn-sm" onclick="ackAlert(${a.id})">Reconhecer</button>`:'<span class="text-xs text-slate-500">✓ Rec.</span>'}
     </div>`).join('');
 }
-function ackAlert(id){const a=alerts.find(x=>x.id===id);if(a){a.acked=true;renderAlertsFull();}}
+function ackAlert(id){const a=alerts.find(x=>x.id===id);if(a){a.acked=true;renderAlertsFull();updateAlertBadge();}}
 function filterAlerts(f){S.alertFilter=f;['ALL','CRITICAL','WARNING','INFO'].forEach(x=>{const b=document.getElementById('fa-'+x);b.className='btn btn-sm '+(x===f?'btn-primary':'btn-ghost');});renderAlertsFull();}
 
 function renderUsers(){
@@ -1937,6 +1960,106 @@ function initReportChart(){
 }
 
 // ============================================================
+// NOTIFICAÇÕES — badge + toasts críticos
+// ============================================================
+let _nextAlertId = 10;
+const CRITICAL_MESSAGES = [
+  {msg:'Detetor de fumo ativado — Piso 3, Sala Aquilino',sys:'SCI'},
+  {msg:'Falha de alimentação — UPS Quadro Principal Q1',sys:'Elétrico'},
+  {msg:'Temperatura AVAC acima do limite — Piso 2 (32°C)',sys:'AVAC'},
+  {msg:'Câmera 07 sem sinal — Corredor Bloco B',sys:'Segurança'},
+  {msg:'Pressão hidráulica crítica — Ramal Piso 4',sys:'Hidráulica'},
+  {msg:'Elevador 1 — Porta não fecha (sensor falha)',sys:'Elevadores'},
+  {msg:'Intrusão detetada — Entrada Bloco A fora de horas',sys:'Segurança'},
+  {msg:'Sobretensão no Quadro Q3 — Piso 1',sys:'Elétrico'},
+];
+
+function updateAlertBadge(){
+  const unread = alerts.filter(a=>a.sev==='CRITICAL' && !a.acked).length;
+  const bell = document.getElementById('bellBadge');
+  const sidebar = document.getElementById('alertBadge');
+  if(unread > 0){
+    bell.textContent = unread > 9 ? '9+' : unread;
+    bell.style.display = 'flex';
+    if(sidebar){ sidebar.textContent = unread; sidebar.style.display = ''; }
+  } else {
+    bell.style.display = 'none';
+    if(sidebar){ sidebar.style.display = 'none'; }
+  }
+}
+
+function showCriticalToast(alertObj){
+  const container = document.getElementById('toastContainer');
+  // Máximo 3 toasts — remove o mais antigo se necessário
+  const existing = container.querySelectorAll('.critical-toast');
+  if(existing.length >= 3) removeToast(existing[0]);
+
+  const id = 'toast-' + Date.now();
+  const div = document.createElement('div');
+  div.className = 'critical-toast';
+  div.id = id;
+  div.innerHTML = `
+    <div class="toast-icon">🚨</div>
+    <div class="toast-body">
+      <div class="toast-title">ALERTA CRÍTICO · ${alertObj.sys.toUpperCase()}</div>
+      <div class="toast-msg">${alertObj.msg}</div>
+      <div class="toast-actions">
+        <button class="toast-btn-ver" onclick="goToAlerts();removeToast(document.getElementById('${id}'))">Ver</button>
+        <button class="toast-btn-close" onclick="removeToast(document.getElementById('${id}'))">Dispensar</button>
+      </div>
+      <div class="toast-bar" id="bar-${id}" style="width:100%"></div>
+    </div>`;
+  container.appendChild(div);
+
+  // Barra de progresso
+  const bar = document.getElementById('bar-' + id);
+  const duration = 6000;
+  const start = Date.now();
+  const tick = setInterval(()=>{
+    const elapsed = Date.now() - start;
+    const pct = Math.max(0, 100 - (elapsed/duration)*100);
+    if(bar) bar.style.width = pct + '%';
+    if(elapsed >= duration){ clearInterval(tick); removeToast(div); }
+  }, 50);
+  div._timer = tick;
+}
+
+function removeToast(el){
+  if(!el || !el.parentNode) return;
+  if(el._timer) clearInterval(el._timer);
+  el.classList.add('removing');
+  setTimeout(()=>{ if(el.parentNode) el.parentNode.removeChild(el); }, 300);
+}
+
+function goToAlerts(){
+  // Navega para Alertas e marca todos os críticos como lidos
+  const navEl = document.querySelector(".nav-item[onclick*=\"'alerts'\"]");
+  showPage('alerts', navEl);
+  alerts.filter(a=>a.sev==='CRITICAL').forEach(a=>a.acked=true);
+  updateAlertBadge();
+  renderAlertsFull();
+  renderAlertsList();
+}
+
+function simulateCriticalAlert(){
+  if(Math.random() > 0.40) return; // 40% de probabilidade
+  const template = CRITICAL_MESSAGES[Math.floor(Math.random()*CRITICAL_MESSAGES.length)];
+  const now = new Date();
+  const time = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  const newAlert = {id:_nextAlertId++, sev:'CRITICAL', msg:template.msg, sys:template.sys, time, acked:false};
+  alerts.unshift(newAlert);
+  updateAlertBadge();
+  // Pulse no badge
+  const bell = document.getElementById('bellBadge');
+  bell.classList.remove('badge-pulse');
+  void bell.offsetWidth; // reflow
+  bell.classList.add('badge-pulse');
+  showCriticalToast(newAlert);
+  renderAlertsList();
+  if(S.currentPage==='alerts') renderAlertsFull();
+}
+
+// ============================================================
 // CLOCK + SIMULATOR + TOAST
 // ============================================================
 function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleString('pt-PT',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});}
@@ -1992,6 +2115,8 @@ function initApp(){
   updateClock();setInterval(updateClock,1000);
   setInterval(simulate,5000);
   setInterval(lsSave,30000);
+  setInterval(simulateCriticalAlert,45000);
+  updateAlertBadge();
   // Restaurar última página visitada
   if(lastPage && lastPage!=='dashboard'){
     const navEl=document.querySelector(`.nav-item[onclick*="'${lastPage}'"]`);
